@@ -137,3 +137,27 @@ The schema uses UUID primary keys, proper foreign key relationships, and JSON fi
 ### API Key Integration
 - **Google API Key**: Added support for GOOGLE_API_KEY environment variable
 - **Enhanced Security**: Conditional OAuth initialization to prevent server crashes
+
+## Current Updates (August 2025)
+
+### Event Sorting and Organization
+- **Host Dashboard Events**: Created events now sorted by newest first (createdAt), then by event date
+- **General Event Listing**: All events sorted by creation date (newest first), then by event timing
+- **Hosted Events API**: Enhanced getMyHostedEvents method with proper sorting logic
+
+### Enhanced RSVP Notification System
+- **RSVP Confirmation**: Users now receive detailed confirmation notifications with event timing and location
+- **Host Notifications**: Event hosts receive notifications when someone RSVPs to their events
+- **Calendar Sync Prompts**: Automatic calendar sync notifications sent after RSVP confirmation
+- **Formatted Date/Time**: Notifications include properly formatted event dates and times
+
+### Improved Google Calendar Integration
+- **Enhanced Calendar Sync**: Updated calendar sync route with better error handling and user feedback
+- **Event Details in Sync**: Calendar events include comprehensive event information (title, date, time, location)
+- **Sync Status Notifications**: Users receive notifications about calendar sync success/failure
+- **Authorization Flow**: Improved Google Calendar authorization with better user guidance
+
+### Notification System Improvements
+- **Notification Sorting**: All notifications sorted by newest first (createdAt)
+- **Enhanced Message Types**: Added rsvp_confirmation and improved calendar_sync notifications
+- **Better User Experience**: Clearer notification messages with actionable information

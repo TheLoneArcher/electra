@@ -78,6 +78,9 @@ export interface IStorage {
   createFavorite(favorite: InsertFavorite): Promise<Favorite>;
   deleteFavorite(userId: string, eventId: string): Promise<boolean>;
   isFavorited(userId: string, eventId: string): Promise<boolean>;
+
+  // My Hosted Events
+  getMyHostedEvents(hostId: string): Promise<Event[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -417,7 +420,14 @@ export class MemStorage implements IStorage {
       });
     }
 
-    return events.sort((a, b) => a.dateTime.getTime() - b.dateTime.getTime());
+    // Sort by newest created first (createdAt), then by event date
+    return events.sort((a, b) => {
+      // First sort by creation date (newest first)
+      const createdAtDiff = (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0);
+      if (createdAtDiff !== 0) return createdAtDiff;
+      // Then by event date (earliest first)
+      return a.dateTime.getTime() - b.dateTime.getTime();
+    });
   }
 
   async getEvent(id: string): Promise<Event | undefined> {
@@ -456,11 +466,18 @@ export class MemStorage implements IStorage {
 
   async getMyHostedEvents(hostId: string) {
     return Array.from(this.events.values())
-      .filter(event => event.hostId === hostId) // Fixed: use hostId instead of organizerId
+      .filter(event => event.hostId === hostId)
       .map(event => ({
         ...event,
         attendingCount: Array.from(this.rsvps.values()).filter(r => r.eventId === event.id && r.status === 'attending').length
-      }));
+      }))
+      .sort((a, b) => {
+        // Sort by newest created first (createdAt), then by event date
+        const createdAtDiff = (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0);
+        if (createdAtDiff !== 0) return createdAtDiff;
+        // Then by event date (earliest first)
+        return a.dateTime.getTime() - b.dateTime.getTime();
+      });
   }
 
   // RSVPs
