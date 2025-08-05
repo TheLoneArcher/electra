@@ -116,7 +116,8 @@ export default function DashboardPage() {
               key={tab.id}
               variant={activeTab === tab.id ? "default" : "outline"}
               onClick={() => setActiveTab(tab.id)}
-              className="px-6 py-3 font-semibold"
+              className={`px-6 py-3 font-semibold ${activeTab === tab.id ? 'glow' : ''}`}
+              data-testid={`tab-${tab.id}`}
             >
               {tab.label}
             </Button>
@@ -125,25 +126,28 @@ export default function DashboardPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat, index) => (
-            <Card key={index} className="bg-white dark:bg-gray-800">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                      {stat.title}
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {stat.value}
-                    </p>
+          {stats.map((stat, index) => {
+            const glowClass = index === 0 ? 'glow' : index === 1 ? 'glow-green' : index === 2 ? 'glow-purple' : 'glow-orange';
+            return (
+              <Card key={index} className={`bg-white dark:bg-gray-800 ${glowClass} transition-all duration-300 hover:scale-105`}>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                        {stat.title}
+                      </p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {stat.value}
+                      </p>
+                    </div>
+                    <div className={`${stat.bgColor} rounded-full p-3`}>
+                      <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                    </div>
                   </div>
-                  <div className={`${stat.bgColor} rounded-full p-3`}>
-                    <stat.icon className={`h-6 w-6 ${stat.color}`} />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
         {/* My Upcoming Events */}

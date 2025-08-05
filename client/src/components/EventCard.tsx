@@ -122,7 +122,7 @@ export function EventCard({ event }: EventCardProps) {
   return (
     <>
       <Card 
-        className="bg-white dark:bg-gray-700 rounded-xl shadow-lg overflow-hidden event-card-hover group cursor-pointer"
+        className="bg-white dark:bg-gray-700 rounded-xl shadow-lg overflow-hidden event-card-hover group cursor-pointer glow transition-all duration-300 hover:transform hover:scale-105"
         onClick={() => setShowDetails(true)}
       >
         <div 

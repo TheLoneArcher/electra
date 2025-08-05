@@ -111,7 +111,7 @@ export default function LandingPage() {
           <div className="text-center">
             <div className="mb-8">
               <Badge className="mb-4 px-4 py-2 text-sm font-medium bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-200 dark:text-blue-300 border border-blue-500/30 backdrop-blur-sm">
-                ⚡ Powered by Modern Technology
+                ⚡ The Future of Event Management
               </Badge>
             </div>
             
@@ -155,17 +155,17 @@ export default function LandingPage() {
             
             {/* Tech Stats */}
             <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl mx-auto">
-              <div className="text-center p-4 rounded-lg bg-gray-900/30 backdrop-blur-sm border border-gray-700/50">
-                <div className="text-2xl font-bold text-blue-400 mb-1">99.9%</div>
-                <div className="text-gray-400 text-sm">Uptime</div>
+              <div className="text-center p-6 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700 glow">
+                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">99.9%</div>
+                <div className="text-gray-700 dark:text-gray-300 font-medium">Uptime</div>
               </div>
-              <div className="text-center p-4 rounded-lg bg-gray-900/30 backdrop-blur-sm border border-gray-700/50">
-                <div className="text-2xl font-bold text-purple-400 mb-1">&lt;50ms</div>
-                <div className="text-gray-400 text-sm">Response Time</div>
+              <div className="text-center p-6 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700 glow-purple">
+                <div className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">&lt;50ms</div>
+                <div className="text-gray-700 dark:text-gray-300 font-medium">Response Time</div>
               </div>
-              <div className="text-center p-4 rounded-lg bg-gray-900/30 backdrop-blur-sm border border-gray-700/50">
-                <div className="text-2xl font-bold text-cyan-400 mb-1">10K+</div>
-                <div className="text-gray-400 text-sm">Active Users</div>
+              <div className="text-center p-6 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700 glow-green">
+                <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">10K+</div>
+                <div className="text-gray-700 dark:text-gray-300 font-medium">Active Users</div>
               </div>
             </div>
           </div>

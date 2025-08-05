@@ -280,6 +280,15 @@ export class MemStorage implements IStorage {
     return Array.from(this.events.values()).filter(event => event.organizerId === hostId);
   }
 
+  async getMyHostedEvents(hostId: string) {
+    return Array.from(this.events.values())
+      .filter(event => event.organizerId === hostId)
+      .map(event => ({
+        ...event,
+        attendingCount: Array.from(this.rsvps.values()).filter(r => r.eventId === event.id && r.status === 'attending').length
+      }));
+  }
+
   // RSVPs
   async getRsvpsByEvent(eventId: string): Promise<Rsvp[]> {
     return Array.from(this.rsvps.values()).filter(rsvp => rsvp.eventId === eventId);
@@ -320,6 +329,22 @@ export class MemStorage implements IStorage {
     if (!rsvp) return false;
     
     return this.rsvps.delete(rsvp.id);
+  }
+
+  async getMyRsvps(userId: string) {
+    return Array.from(this.rsvps.values())
+      .filter((rsvp) => rsvp.userId === userId)
+      .map((rsvp) => {
+        const event = Array.from(this.events.values()).find((event) => event.id === rsvp.eventId);
+        return {
+          ...rsvp,
+          event: event ? {
+            ...event,
+            attendingCount: Array.from(this.rsvps.values()).filter(r => r.eventId === event.id && r.status === 'attending').length
+          } : null,
+        };
+      })
+      .filter((rsvp) => rsvp.event !== null);
   }
 
   // Reviews

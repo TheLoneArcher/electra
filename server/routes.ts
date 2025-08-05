@@ -154,11 +154,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertEventSchema.parse({
         ...req.body,
-        hostId: req.user.id, // Set host to current user
+        organizerId: req.user.id, // Set organizer to current user
+        status: "upcoming",
       });
       const event = await storage.createEvent(validatedData);
       res.status(201).json(event);
     } catch (error) {
+      console.error("Event creation error:", error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid event data", errors: error.errors });
       }
@@ -281,24 +283,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Current user's hosted events
   app.get("/api/my-hosted-events", requireAuth, async (req: any, res) => {
     try {
-      const events = await storage.getEvents({ hostId: req.user.id });
-      
-      // Enrich events with category info and RSVP counts
-      const enrichedEvents = await Promise.all(
-        events.map(async (event) => {
-          const category = await storage.getEventCategory(event.categoryId);
-          const rsvps = await storage.getRsvpsByEvent(event.id);
-          const attendingCount = rsvps.filter(rsvp => rsvp.status === "attending").length;
-          
-          return {
-            ...event,
-            category,
-            attendingCount,
-          };
-        })
-      );
-      
-      res.json(enrichedEvents);
+      const events = await storage.getMyHostedEvents(req.user.id);
+      res.json(events);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch hosted events" });
     }
