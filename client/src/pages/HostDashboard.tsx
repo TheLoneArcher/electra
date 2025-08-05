@@ -3,11 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Plus, Megaphone, Camera, TrendingUp, Users, DollarSign } from "lucide-react";
+import { Plus, Megaphone, Camera, TrendingUp, Users, DollarSign, MoreHorizontal, Edit, Trash2, Clock, Crown, Lightbulb, Music, Gamepad2, Coffee, Briefcase, Heart, GraduationCap, MapPin, Palette, Trophy } from "lucide-react";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import Navbar from "@/components/Navbar";
 import { CreateEventModal } from "@/components/CreateEventModal";
+import { format } from "date-fns";
 
 // Helper function to generate chart data from real events
 const generateChartData = (events: any[]) => {
@@ -42,6 +44,38 @@ const generateChartData = (events: any[]) => {
   return { rsvpData, eventPerformanceData, recentRsvps: [] };
 };
 
+// Category icon mapping
+const getCategoryIcon = (category: any) => {
+  const categoryIconMap: { [key: string]: any } = {
+    'music': Music,
+    'gaming': Gamepad2,
+    'social': Coffee,
+    'professional': Briefcase,
+    'lifestyle': Heart,
+    'education': GraduationCap,
+    'travel': MapPin,
+    'art': Palette,
+    'sports': Trophy,
+  };
+  return categoryIconMap[category?.name?.toLowerCase()] || Heart;
+};
+
+// Category color mapping
+const getCategoryColor = (category: any) => {
+  const categoryColorMap: { [key: string]: string } = {
+    'music': 'bg-purple-500',
+    'gaming': 'bg-green-500',
+    'social': 'bg-blue-500',
+    'professional': 'bg-gray-600',
+    'lifestyle': 'bg-pink-500',
+    'education': 'bg-indigo-500',
+    'travel': 'bg-orange-500',
+    'art': 'bg-yellow-500',
+    'sports': 'bg-red-500',
+  };
+  return categoryColorMap[category?.name?.toLowerCase()] || 'bg-blue-500';
+};
+
 export default function HostDashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
@@ -52,6 +86,7 @@ export default function HostDashboard() {
   const [announcementMessage, setAnnouncementMessage] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
   const [photoCaption, setPhotoCaption] = useState("");
+  const [selectedEventForAnnouncement, setSelectedEventForAnnouncement] = useState<string | null>(null);
 
   const { user } = useAuth();
   const { toast } = useToast();
@@ -67,6 +102,85 @@ export default function HostDashboard() {
 
   // Generate chart data from real events
   const { rsvpData, eventPerformanceData, recentRsvps } = generateChartData(hostedEvents);
+
+  // Event management handlers
+  const handleEditEvent = (eventId: string) => {
+    toast({
+      title: "Edit Event",
+      description: "Edit functionality coming soon!",
+    });
+  };
+
+  const handleSendAnnouncement = (eventId: string) => {
+    setSelectedEventForAnnouncement(eventId);
+    setShowAnnouncementModal(true);
+  };
+
+  const deleteEventMutation = useMutation({
+    mutationFn: (eventId: string) => apiRequest("DELETE", `/api/events/${eventId}`),
+    onSuccess: () => {
+      toast({
+        title: "Event Deleted",
+        description: "Your event has been deleted successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/my-hosted-events"] });
+    },
+    onError: () => {
+      toast({
+        title: "Delete Failed",
+        description: "Failed to delete event. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDeleteEvent = (eventId: string) => {
+    if (confirm("Are you sure you want to delete this event? This action cannot be undone.")) {
+      deleteEventMutation.mutate(eventId);
+    }
+  };
+
+  const announcementMutation = useMutation({
+    mutationFn: (data: { eventId: string; subject: string; message: string }) =>
+      apiRequest("POST", `/api/events/${data.eventId}/announcements`, {
+        subject: data.subject,
+        message: data.message,
+      }),
+    onSuccess: (data) => {
+      toast({
+        title: "Announcement Sent",
+        description: `Announcement sent to ${data.recipientCount} attendees`,
+      });
+      setShowAnnouncementModal(false);
+      setAnnouncementSubject("");
+      setAnnouncementMessage("");
+      setSelectedEventForAnnouncement(null);
+    },
+    onError: () => {
+      toast({
+        title: "Failed to Send",
+        description: "Failed to send announcement. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const submitSelectedEventAnnouncement = () => {
+    if (!selectedEventForAnnouncement || !announcementSubject.trim() || !announcementMessage.trim()) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in both subject and message.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    announcementMutation.mutate({
+      eventId: selectedEventForAnnouncement,
+      subject: announcementSubject,
+      message: announcementMessage,
+    });
+  };
 
   const metrics = [
     {
@@ -250,45 +364,67 @@ export default function HostDashboard() {
                   </Button>
                 </div>
 
-                {/* Recent RSVPs */}
+                {/* My Created Events */}
                 <div className="mt-6">
                   <h4 className="font-semibold text-gray-900 dark:text-white mb-3">
-                    Recent RSVPs
+                    My Created Events ({hostedEvents.length})
                   </h4>
-                  {recentRsvps.length > 0 ? (
+                  {hostedEvents.length > 0 ? (
                     <div className="space-y-3">
-                      {recentRsvps.map((rsvp) => (
-                        <div key={rsvp.id} className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <Avatar className="h-8 w-8">
-                              <AvatarImage src={rsvp.avatar} alt={rsvp.name} />
-                              <AvatarFallback>
-                                {rsvp.name.split(" ").map(n => n[0]).join("")}
-                              </AvatarFallback>
-                            </Avatar>
+                      {hostedEvents.slice(0, 4).map((event: any) => (
+                        <div key={event.id} className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg border">
+                          <div className="flex items-center space-x-3">
+                            <div className={`${getCategoryColor(event.category)} rounded-lg p-2`}>
+                              {(() => {
+                                const IconComponent = getCategoryIcon(event.category);
+                                return <IconComponent className="h-4 w-4 text-white" />;
+                              })()}
+                            </div>
                             <div>
                               <span className="text-sm font-medium text-gray-900 dark:text-white">
-                                {rsvp.name}
+                                {event.title}
                               </span>
-                              <p className="text-xs text-gray-500 dark:text-gray-400">
-                                {rsvp.time}
-                              </p>
+                              <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 space-x-2">
+                                <span className="flex items-center">
+                                  <Clock className="h-3 w-3 mr-1" />
+                                  {format(new Date(event.dateTime), "MMM dd")}
+                                </span>
+                                <span className="flex items-center">
+                                  <Users className="h-3 w-3 mr-1" />
+                                  {event.attendeeCount || 0}
+                                </span>
+                              </div>
                             </div>
                           </div>
-                          <span className={`text-xs px-2 py-1 rounded-full ${
-                            rsvp.status === "RSVP'd" 
-                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" 
-                              : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                          }`}>
-                            {rsvp.status}
-                          </span>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleEditEvent(event.id)}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleSendAnnouncement(event.id)}>
+                                <Megaphone className="mr-2 h-4 w-4" />
+                                Announce
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={() => handleDeleteEvent(event.id)} className="text-red-600">
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       ))}
                     </div>
                   ) : (
                     <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                      <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                      <p className="text-sm">No recent RSVPs yet</p>
+                      <Crown className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                      <p className="text-sm">No events created yet</p>
                     </div>
                   )}
                 </div>
@@ -314,94 +450,53 @@ export default function HostDashboard() {
         onClose={() => setShowCreateModal(false)}
       />
 
-      {/* Announcement Modal */}
+      {/* Announcement Modal - Updated for direct event selection */}
       <Dialog open={showAnnouncementModal} onOpenChange={setShowAnnouncementModal}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Send Announcement</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div>
-              <Label htmlFor="event-select">Select Event</Label>
-              <Select value={selectedEvent} onValueChange={setSelectedEvent}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose an event" />
-                </SelectTrigger>
-                <SelectContent>
-                  {hostedEvents.map((event: any) => (
-                    <SelectItem key={event.id} value={event.id}>
-                      {event.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
+            {selectedEventForAnnouncement && (
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <p className="text-sm text-blue-800 dark:text-blue-300">
+                  Sending to: <span className="font-semibold">
+                    {hostedEvents.find(e => e.id === selectedEventForAnnouncement)?.title}
+                  </span>
+                </p>
+              </div>
+            )}
             <div>
               <Label htmlFor="subject">Subject</Label>
               <Input
                 id="subject"
                 value={announcementSubject}
                 onChange={(e) => setAnnouncementSubject(e.target.value)}
-                placeholder="Announcement subject"
+                placeholder="Enter announcement subject..."
               />
             </div>
-            
             <div>
               <Label htmlFor="message">Message</Label>
               <Textarea
                 id="message"
                 value={announcementMessage}
                 onChange={(e) => setAnnouncementMessage(e.target.value)}
-                placeholder="Your announcement message..."
                 rows={4}
+                placeholder="Enter your announcement message..."
               />
             </div>
-            
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setShowAnnouncementModal(false)} className="flex-1">
-                Cancel
-              </Button>
-              <Button 
-                onClick={async () => {
-                  if (!selectedEvent || !announcementSubject || !announcementMessage) {
-                    toast({
-                      title: "Error",
-                      description: "Please fill in all fields",
-                      variant: "destructive"
-                    });
-                    return;
-                  }
-                  
-                  try {
-                    await apiRequest("POST", `/api/events/${selectedEvent}/announcements`, {
-                      subject: announcementSubject,
-                      message: announcementMessage
-                    });
-                    
-                    toast({
-                      title: "Success",
-                      description: "Announcement sent to all attendees"
-                    });
-                    
-                    setShowAnnouncementModal(false);
-                    setSelectedEvent("");
-                    setAnnouncementSubject("");
-                    setAnnouncementMessage("");
-                  } catch (error) {
-                    toast({
-                      title: "Error",
-                      description: "Failed to send announcement",
-                      variant: "destructive"
-                    });
-                  }
-                }}
-                className="flex-1"
-              >
-                Send Announcement
-              </Button>
-            </div>
           </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAnnouncementModal(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={submitSelectedEventAnnouncement}
+              disabled={!announcementSubject.trim() || !announcementMessage.trim() || announcementMutation.isPending}
+            >
+              {announcementMutation.isPending ? "Sending..." : "Send Announcement"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

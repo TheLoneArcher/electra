@@ -255,49 +255,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
         const rsvp = await storage.createRsvp(validatedData);
         
-        // Send notification to event host
+        // Send immediate notifications for new RSVP
         if (status === 'attending') {
           const event = await storage.getEvent(req.params.eventId);
-          if (event && event.hostId !== req.user.id) {
-            await storage.createNotification({
-              userId: event.hostId,
-              type: "rsvp_update",
-              title: "New RSVP",
-              message: `${req.user.name} is attending your event "${event.title}"`,
-              eventId: event.id,
+          if (event) {
+            // Send notification to event host
+            if (event.hostId !== req.user.id) {
+              try {
+                await storage.createNotification({
+                  userId: event.hostId,
+                  type: "rsvp_update",
+                  title: "New RSVP 🎉",
+                  message: `${req.user.name} is attending your event "${event.title}"`,
+                  eventId: event.id,
+                });
+                console.log(`Host notification sent for RSVP to event: ${event.title}`);
+              } catch (error) {
+                console.error("Failed to send host notification:", error);
+              }
+            }
+            
+            // Send confirmation notification to the user who RSVP'd
+            const eventDate = new Date(event.dateTime);
+            const formattedDate = eventDate.toLocaleDateString('en-US', { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
             });
+            const formattedTime = eventDate.toLocaleTimeString('en-US', { 
+              hour: 'numeric', 
+              minute: '2-digit', 
+              hour12: true 
+            });
+            
+            try {
+              await storage.createNotification({
+                userId: req.user.id,
+                type: "rsvp_confirmation",
+                title: "RSVP Confirmed! ✅",
+                message: `You're all set for "${event.title}" on ${formattedDate} at ${formattedTime}. Location: ${event.location}`,
+                eventId: event.id,
+              });
+              console.log(`RSVP confirmation sent to user: ${req.user.name} for event: ${event.title}`);
+            } catch (error) {
+              console.error("Failed to send RSVP confirmation:", error);
+            }
+            
+            // Automatically create a calendar sync notification
+            try {
+              await storage.createNotification({
+                userId: req.user.id,
+                type: "calendar_sync",
+                title: "Add to Calendar 📅",
+                message: `Sync "${event.title}" to your Google Calendar to never miss it!`,
+                eventId: event.id,
+              });
+              console.log(`Calendar sync notification sent to user: ${req.user.name}`);
+            } catch (error) {
+              console.error("Failed to send calendar sync notification:", error);
+            }
           }
-          
-          // Send confirmation notification to the user who RSVP'd
-          const eventDate = new Date(event.dateTime);
-          const formattedDate = eventDate.toLocaleDateString('en-US', { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-          });
-          const formattedTime = eventDate.toLocaleTimeString('en-US', { 
-            hour: 'numeric', 
-            minute: '2-digit', 
-            hour12: true 
-          });
-          
-          await storage.createNotification({
-            userId: req.user.id,
-            type: "rsvp_confirmation",
-            title: "RSVP Confirmed!",
-            message: `You're all set for "${event.title}" on ${formattedDate} at ${formattedTime}. Location: ${event.location}. Click here to add to your calendar.`,
-            eventId: event.id,
-          });
-          
-          // Automatically create a calendar sync notification
-          await storage.createNotification({
-            userId: req.user.id,
-            type: "calendar_sync",
-            title: "Add to Calendar",
-            message: `Sync "${event.title}" to your Google Calendar to never miss it!`,
-            eventId: event.id,
-          });
         }
         
         res.status(201).json(rsvp);
@@ -606,21 +624,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const rsvps = await storage.getRsvpsByEvent(req.params.eventId);
       const attendees = rsvps.filter(rsvp => rsvp.status === 'attending');
       
-      // Send notification to each attendee
+      // Send notification to each attendee immediately
+      let recipientCount = 0;
       for (const attendee of attendees) {
-        await storage.createNotification({
-          userId: attendee.userId,
-          type: "announcement",
-          title: `Announcement: ${subject}`,
-          message: message,
-          eventId: event.id,
-        });
+        try {
+          await storage.createNotification({
+            userId: attendee.userId,
+            type: "announcement",
+            title: `📢 ${subject}`,
+            message: `Announcement for "${event.title}": ${message}`,
+            eventId: event.id,
+          });
+          recipientCount++;
+          console.log(`Notification sent to user: ${attendee.userId} for announcement: ${subject}`);
+        } catch (notifError) {
+          console.error("Failed to send notification to user:", attendee.userId, notifError);
+        }
       }
+      
+      console.log(`Total announcements sent: ${recipientCount} out of ${attendees.length} attendees`);
       
       res.json({ 
         announcement,
-        message: `Announcement sent to ${attendees.length} attendees`,
-        recipientCount: attendees.length 
+        message: `Announcement sent to ${recipientCount} attendees`,
+        recipientCount: recipientCount 
       });
     } catch (error) {
       console.error("Announcement error:", error);
