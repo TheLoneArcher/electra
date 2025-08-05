@@ -27,7 +27,6 @@ export function EventDetailsModal({ eventId, isOpen, onClose }: EventDetailsModa
   const rsvpMutation = useMutation({
     mutationFn: async (status: string) => {
       return apiRequest("POST", `/api/events/${eventId}/rsvp`, {
-        userId: "sample-user-1",
         status,
       });
     },
@@ -50,10 +49,7 @@ export function EventDetailsModal({ eventId, isOpen, onClose }: EventDetailsModa
 
   const syncToCalendarMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest("POST", "/api/calendar/add-event", {
-        eventId,
-        userId: "sample-user-1",
-      });
+      return apiRequest("POST", `/api/events/${eventId}/sync-calendar`, {});
     },
     onSuccess: () => {
       toast({

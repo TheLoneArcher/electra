@@ -38,10 +38,7 @@ function PastEventCard({ event, userRsvp }: PastEventCardProps) {
 
   const submitReviewMutation = useMutation({
     mutationFn: async (reviewData: { rating: number; comment: string }) => {
-      return apiRequest("POST", `/api/events/${event.id}/reviews`, {
-        userId: "sample-user-1",
-        ...reviewData,
-      });
+      return apiRequest("POST", `/api/events/${event.id}/reviews`, reviewData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/events", event.id] });
