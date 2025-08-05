@@ -15,6 +15,7 @@ import {
 import { z } from "zod";
 import { createCalendarEvent, getCalendarAuthUrl, exchangeCodeForTokens } from "./calendar";
 import { notificationManager } from "./notifications";
+import { eventReminderSystem } from "./eventReminders";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication

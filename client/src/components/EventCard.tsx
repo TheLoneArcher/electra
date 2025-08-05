@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { format } from "date-fns";
 import { EventDetailsModal } from "./EventDetailsModal";
+import { EditEventModal } from "./EditEventModal";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -172,7 +173,14 @@ export function EventCard({ event }: EventCardProps) {
     }
   };
 
+  const [showEditModal, setShowEditModal] = useState(false);
+
   const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowEditModal(true);
+  };
+
+  const handleEditOld = (e: React.MouseEvent) => {
     e.stopPropagation();
     // TODO: Open edit modal
     toast({
@@ -348,6 +356,14 @@ export function EventCard({ event }: EventCardProps) {
           eventId={event.id}
           isOpen={showDetails}
           onClose={() => setShowDetails(false)}
+        />
+      )}
+
+      {showEditModal && (
+        <EditEventModal
+          eventId={event.id}
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
         />
       )}
     </>

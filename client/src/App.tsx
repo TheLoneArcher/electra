@@ -12,6 +12,7 @@ import HostDashboard from "@/pages/HostDashboard";
 import PastEventsPage from "@/pages/PastEventsPage";
 import LandingPage from "@/pages/LandingPage";
 import BrowsePage from "@/pages/BrowsePage";
+import CalendarPage from "@/pages/CalendarPage";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -37,6 +38,7 @@ function Router() {
           <Route path="/dashboard" component={DashboardPage} />
           <Route path="/host" component={HostDashboard} />
           <Route path="/past-events" component={PastEventsPage} />
+          <Route path="/calendar" component={CalendarPage} />
           <Route path="/browse" component={BrowsePage} />
         </>
       )}

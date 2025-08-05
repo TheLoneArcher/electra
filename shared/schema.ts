@@ -67,7 +67,7 @@ export const notifications = pgTable("notifications", {
   userId: varchar("user_id").notNull(),
   title: text("title").notNull(),
   message: text("message").notNull(),
-  type: text("type").notNull(), // rsvp_update, event_reminder, event_update, announcement
+  type: text("type").notNull(), // rsvp_update, event_reminder, event_update, announcement, rsvp_confirmation, calendar_sync, event_reminder_24h, event_reminder_1h
   eventId: varchar("event_id"),
   isRead: boolean("is_read").default(false),
   createdAt: timestamp("created_at").defaultNow(),

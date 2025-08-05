@@ -42,7 +42,8 @@ function PastEventCard({ event, userRsvp }: PastEventCardProps) {
       return apiRequest("POST", `/api/events/${event.id}/reviews`, reviewData);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/events", event.id] });
+      queryClient.invalidateQueries({ queryKey: [`/api/events/${event.id}`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/events"] });
       setShowReviewModal(false);
       setRating(0);
       setComment("");
@@ -51,10 +52,52 @@ function PastEventCard({ event, userRsvp }: PastEventCardProps) {
         description: "Thank you for your feedback!",
       });
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error("Review submission error:", error);
       toast({
         title: "Error",
-        description: "Failed to submit review. Please try again.",
+        description: error?.message || "Failed to submit review. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSubmitReview = () => {
+    if (rating === 0) {
+      toast({
+        title: "Rating Required",
+        description: "Please select a rating before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
+    submitReviewMutation.mutate({ rating, comment });
+  };
+
+  // Favorite functionality for past events
+  const { data: favoriteData } = useQuery({
+    queryKey: [`/api/events/${event.id}/favorite`],
+    enabled: !!event.id,
+  });
+
+  const isLiked = favoriteData?.favorited || false;
+
+  const favoriteMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("POST", `/api/events/${event.id}/favorite`, {});
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: [`/api/events/${event.id}/favorite`] });
+      toast({
+        title: data.favorited ? "Added to Favorites" : "Removed from Favorites",
+        description: data.message,
+      });
+    },
+    onError: (error: any) => {
+      console.error("Favorite toggle error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update favorite. Please try again.",
         variant: "destructive",
       });
     },
@@ -72,18 +115,6 @@ function PastEventCard({ event, userRsvp }: PastEventCardProps) {
 
   const eventDate = new Date(event.dateTime);
   const bgColor = categoryColorMap[categoryColor] || "bg-gray-600";
-
-  const handleSubmitReview = () => {
-    if (rating === 0) {
-      toast({
-        title: "Rating Required",
-        description: "Please select a rating before submitting.",
-        variant: "destructive",
-      });
-      return;
-    }
-    submitReviewMutation.mutate({ rating, comment });
-  };
 
   return (
     <Card className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
@@ -238,8 +269,18 @@ function PastEventCard({ event, userRsvp }: PastEventCardProps) {
             <Camera className="h-4 w-4" />
           </Button>
           
-          <Button variant="outline" size="icon">
-            <Heart className="h-4 w-4" />
+          <Button 
+            variant="outline" 
+            size="icon"
+            onClick={() => favoriteMutation.mutate()}
+            disabled={favoriteMutation.isPending}
+            className={`transition-all duration-200 ${
+              isLiked 
+                ? "text-red-500 hover:text-red-600 scale-110" 
+                : "text-gray-600 dark:text-gray-400 hover:text-red-500 hover:scale-105"
+            }`}
+          >
+            <Heart className={`h-4 w-4 transition-all duration-200 ${isLiked ? "fill-current text-red-500" : ""}`} />
           </Button>
         </div>
       </CardContent>
