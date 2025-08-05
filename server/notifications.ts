@@ -117,17 +117,34 @@ export class NotificationManager {
       if (!event) return;
 
       const eventDate = new Date(event.dateTime);
+      const now = new Date();
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
+      const oneHourFromNow = new Date(now.getTime() + 60 * 60 * 1000);
 
-      // Only send reminders for events happening tomorrow
+      // Send reminders for events happening tomorrow (1-day reminder)
       if (eventDate.toDateString() === tomorrow.toDateString()) {
         for (const rsvp of rsvps) {
           if (rsvp.status === 'attending') {
             await this.createNotification({
               userId: rsvp.userId,
-              title: 'Event Reminder',
+              title: 'Event Reminder - Tomorrow',
               message: `Don't forget: "${event.title}" is tomorrow at ${eventDate.toLocaleTimeString()}`,
+              type: 'event_reminder',
+              eventId,
+            });
+          }
+        }
+      }
+
+      // Send reminders for events happening within the next hour (1-hour reminder)
+      if (eventDate > now && eventDate <= oneHourFromNow) {
+        for (const rsvp of rsvps) {
+          if (rsvp.status === 'attending') {
+            await this.createNotification({
+              userId: rsvp.userId,
+              title: 'Event Starting Soon!',
+              message: `"${event.title}" starts in less than an hour at ${eventDate.toLocaleTimeString()}. Don't miss it!`,
               type: 'event_reminder',
               eventId,
             });
@@ -164,3 +181,15 @@ setInterval(async () => {
     console.error('Error in daily reminder job:', error);
   }
 }, 24 * 60 * 60 * 1000); // Run daily
+
+// Background job to send hourly reminders for events starting soon
+setInterval(async () => {
+  try {
+    const events = await storage.getEvents({});
+    for (const event of events) {
+      await notificationManager.notifyEventReminder(event.id);
+    }
+  } catch (error) {
+    console.error('Error in hourly reminder job:', error);
+  }
+}, 60 * 60 * 1000); // Run every hour

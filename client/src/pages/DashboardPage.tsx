@@ -3,15 +3,20 @@ import { Calendar, CheckCircle, Crown, Users, ExternalLink, Clock, Music, Gamepa
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { format } from "date-fns";
 import Navbar from "@/components/Navbar";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { EventDetailsModal } from "@/components/EventDetailsModal";
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("upcoming");
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
   const { user } = useAuth();
+  const { toast } = useToast();
   const { data: userRsvps = [] } = useQuery({
     queryKey: ["/api/my-rsvps"],
     enabled: !!user,
@@ -98,6 +103,39 @@ export default function DashboardPage() {
       indigo: "bg-indigo-600",
     };
     return colorMap[category.color] || "bg-gray-600";
+  };
+
+  // Calendar sync mutation
+  const calendarSyncMutation = useMutation({
+    mutationFn: async (eventId: string) => {
+      return apiRequest("POST", `/api/events/${eventId}/sync-calendar`, {});
+    },
+    onSuccess: (data) => {
+      if (data.needsAuth && data.authUrl) {
+        // Open authorization window
+        window.open(data.authUrl, '_blank', 'width=500,height=600');
+        toast({
+          title: "Calendar Authorization",
+          description: "Please authorize calendar access in the new window to sync this event.",
+        });
+      } else {
+        toast({
+          title: "Calendar Sync",
+          description: "Event has been added to your Google Calendar!",
+        });
+      }
+    },
+    onError: () => {
+      toast({
+        title: "Calendar Sync Failed",
+        description: "Failed to add event to calendar. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleCalendarSync = (eventId: string) => {
+    calendarSyncMutation.mutate(eventId);
   };
 
   return (
@@ -197,10 +235,23 @@ export default function DashboardPage() {
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Button variant="ghost" size="icon" title="Add to Calendar">
-                          <i className="fab fa-google text-primary"></i>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          title="Add to Calendar"
+                          onClick={() => handleCalendarSync(rsvp.event.id)}
+                          disabled={calendarSyncMutation.isPending}
+                          data-testid={`button-calendar-sync-${rsvp.event.id}`}
+                        >
+                          <Calendar className="h-4 w-4 text-primary" />
                         </Button>
-                        <Button variant="ghost" size="icon" title="View Details">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          title="View Details"
+                          onClick={() => setSelectedEventId(rsvp.event.id)}
+                          data-testid={`button-view-details-${rsvp.event.id}`}
+                        >
                           <ExternalLink className="h-4 w-4" />
                         </Button>
                       </div>
@@ -317,10 +368,21 @@ export default function DashboardPage() {
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setSelectedEventId(event.id)}
+                          data-testid={`button-manage-event-${event.id}`}
+                        >
                           Manage Event
                         </Button>
-                        <Button variant="ghost" size="icon" title="View Details">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          title="View Details"
+                          onClick={() => setSelectedEventId(event.id)}
+                          data-testid={`button-view-hosted-event-${event.id}`}
+                        >
                           <ExternalLink className="h-4 w-4" />
                         </Button>
                       </div>
@@ -350,6 +412,15 @@ export default function DashboardPage() {
           </Card>
         )}
       </div>
+
+      {/* Event Details Modal */}
+      {selectedEventId && (
+        <EventDetailsModal
+          eventId={selectedEventId}
+          isOpen={!!selectedEventId}
+          onClose={() => setSelectedEventId(null)}
+        />
+      )}
     </div>
   );
 }

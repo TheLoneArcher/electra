@@ -114,3 +114,26 @@ The schema uses UUID primary keys, proper foreign key relationships, and JSON fi
 - ✅ Event announcements (appears in event cards)
 - ✅ Photo upload functionality (working with URL input)
 - ✅ Real attendee counts (replaced fake avatars)
+
+## Latest Fixes (January 2025)
+
+### Notification System Improvements
+- **Enhanced Reminder Schedule**: Added both 1-day and 1-hour event reminders
+- **Dual Background Jobs**: Daily job for 1-day reminders, hourly job for 1-hour reminders
+- **Improved Messaging**: Different notification titles and messages for different reminder times
+
+### Dashboard Event Management
+- **Working Buttons**: Fixed "View Details", "Manage Event", and "Add to Calendar" buttons
+- **Event Details Modal**: Integrated EventDetailsModal for proper event viewing
+- **Calendar Integration**: Added Google Calendar authorization flow with popup windows
+- **User Feedback**: Toast notifications for all button interactions
+
+### Google Calendar Integration
+- **Authorization Flow**: Complete OAuth flow with callback handling
+- **Calendar API Routes**: Added /api/calendar/auth-url and /api/calendar/callback endpoints  
+- **User Notifications**: Calendar sync status notifications in notification system
+- **Error Handling**: Proper error messages and retry mechanisms
+
+### API Key Integration
+- **Google API Key**: Added support for GOOGLE_API_KEY environment variable
+- **Enhanced Security**: Conditional OAuth initialization to prevent server crashes

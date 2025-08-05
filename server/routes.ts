@@ -403,7 +403,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Calendar sync (simplified version that works)  
+  // Calendar sync with Google Calendar authorization flow
   app.post("/api/events/:eventId/sync-calendar", requireAuth, async (req: any, res) => {
     try {
       const event = await storage.getEvent(req.params.eventId);
@@ -411,23 +411,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Event not found" });
       }
 
-      // Create success notification 
+      // For now, redirect to Google Calendar authorization
+      const { getCalendarAuthUrl } = await import('./calendar');
+      const authUrl = await getCalendarAuthUrl(req.user.id);
+      
+      // Create success notification immediately (simplified approach)
       await storage.createNotification({
         userId: req.user.id,
         type: "calendar_sync",
-        title: "Calendar Sync Success",
-        message: `Event "${event.title}" has been added to your calendar`,
+        title: "Calendar Sync Initiated",
+        message: `Click the authorization link to add "${event.title}" to your Google Calendar`,
         eventId: event.id,
       });
       
-      res.json({ message: "Event synced to calendar successfully" });
+      res.json({ 
+        needsAuth: true, 
+        authUrl,
+        message: "Calendar authorization required",
+        instructions: "Please authorize calendar access to sync this event"
+      });
     } catch (error) {
       console.error("Calendar sync error:", error);
       await storage.createNotification({
         userId: req.user.id,
         type: "calendar_sync",
         title: "Calendar Sync Failed", 
-        message: `Failed to sync "${event.title}" to your calendar`,
+        message: `Failed to initiate calendar sync for "${event.title}". Please try again.`,
         eventId: req.params.eventId,
       });
       res.status(500).json({ message: "Failed to sync event to calendar" });
@@ -577,6 +586,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Notification marked as read" });
     } catch (error) {
       res.status(500).json({ message: "Failed to mark notification as read" });
+    }
+  });
+
+  // Calendar authorization endpoints
+  app.get("/api/calendar/auth-url", requireAuth, async (req: any, res) => {
+    try {
+      const { getCalendarAuthUrl } = await import('./calendar');
+      const authUrl = await getCalendarAuthUrl(req.user.id);
+      res.json({ authUrl });
+    } catch (error) {
+      console.error("Calendar auth URL error:", error);
+      res.status(500).json({ message: "Failed to generate calendar auth URL" });
+    }
+  });
+
+  app.get("/api/calendar/callback", async (req, res) => {
+    try {
+      const { code, state: userId } = req.query;
+      
+      if (!code || !userId) {
+        return res.status(400).json({ message: "Missing authorization code or user ID" });
+      }
+
+      const { exchangeCodeForTokens } = await import('./calendar');
+      const tokens = await exchangeCodeForTokens(code as string);
+
+      // Create success notification
+      await storage.createNotification({
+        userId: userId as string,
+        type: "calendar_sync",
+        title: "Calendar Access Granted",
+        message: "Your Google Calendar has been successfully connected! You can now sync events.",
+      });
+
+      res.send(`
+        <html>
+          <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+            <h2>Calendar Connected Successfully!</h2>
+            <p>You can now close this window and sync events to your Google Calendar.</p>
+            <script>
+              setTimeout(() => window.close(), 3000);
+            </script>
+          </body>
+        </html>
+      `);
+    } catch (error) {
+      console.error("Calendar callback error:", error);
+      res.status(500).send(`
+        <html>
+          <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+            <h2>Authorization Failed</h2>
+            <p>There was an error connecting your calendar. Please try again.</p>
+            <script>
+              setTimeout(() => window.close(), 3000);
+            </script>
+          </body>
+        </html>
+      `);
     }
   });
 
