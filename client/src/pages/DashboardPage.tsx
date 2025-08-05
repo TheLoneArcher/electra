@@ -6,37 +6,23 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import Navbar from "@/components/Navbar";
-import { useAuth } from "@/lib/auth";
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("upcoming");
 
   const { user } = useAuth();
   const { data: userRsvps = [] } = useQuery({
-    queryKey: [`/api/users/${user?.id}/rsvps`],
+    queryKey: ["/api/my-rsvps"],
     enabled: !!user,
   });
 
-  const rsvpArray = Array.isArray(userRsvps) ? userRsvps : [];
-  
-  const upcomingEvents = rsvpArray.filter((rsvp: any) => 
+  const upcomingEvents = userRsvps?.filter((rsvp: any) => 
     rsvp.event && new Date(rsvp.event.dateTime) > new Date() && rsvp.status === "attending"
-  );
+  ) || [];
 
-  const pastEvents = rsvpArray.filter((rsvp: any) => 
+  const pastEvents = userRsvps?.filter((rsvp: any) => 
     rsvp.event && new Date(rsvp.event.dateTime) < new Date() && rsvp.status === "attending"
-  );
-
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 dark:bg-black flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Please sign in to view your dashboard</h1>
-          <p className="text-gray-700 dark:text-gray-300">You need to be logged in to access this page.</p>
-        </div>
-      </div>
-    );
-  }
+  ) || [];
 
   const stats = [
     {

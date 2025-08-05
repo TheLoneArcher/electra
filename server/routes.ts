@@ -238,14 +238,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get current user's RSVP for specific event
-  app.get("/api/events/:eventId/user-rsvp", async (req: any, res) => {
-    // Allow checking RSVP status even when not authenticated
-    const user = getCurrentUser(req);
-    if (!user) {
-      return res.json(null);
-    }
+  app.get("/api/events/:eventId/user-rsvp", requireAuth, async (req: any, res) => {
     try {
-      const rsvp = await storage.getRsvp(req.params.eventId, user.id);
+      const rsvp = await storage.getRsvp(req.params.eventId, req.user.id);
       res.json(rsvp);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch user RSVP" });
