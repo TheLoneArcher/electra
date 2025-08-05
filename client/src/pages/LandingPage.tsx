@@ -68,18 +68,13 @@ export default function LandingPage() {
         {/* Grid Pattern */}
         <div className="absolute inset-0 bg-tech-grid opacity-20 animate-pulse-slow"></div>
         
-        {/* Electric Particles */}
+        {/* Electric Clouds */}
         <div className="absolute inset-0">
-          <div className="particle-1 absolute w-2 h-2 bg-blue-400 rounded-full animate-float-1 animate-electric-spark"></div>
-          <div className="particle-2 absolute w-1 h-1 bg-purple-400 rounded-full animate-float-2 animate-electric-pulse"></div>
-          <div className="particle-3 absolute w-3 h-3 bg-cyan-400 rounded-full animate-float-3 animate-electric-spark"></div>
-          <div className="particle-4 absolute w-1.5 h-1.5 bg-green-400 rounded-full animate-float-4 animate-electric-pulse"></div>
-          <div className="particle-5 absolute w-2.5 h-2.5 bg-pink-400 rounded-full animate-float-5 animate-electric-spark"></div>
-          
-          {/* Lightning bolts */}
-          <div className="absolute top-20 left-10 w-8 h-1 bg-gradient-to-r from-blue-400 to-transparent animate-lightning-bolt"></div>
-          <div className="absolute top-40 right-20 w-8 h-1 bg-gradient-to-r from-purple-400 to-transparent animate-lightning-bolt delay-1000"></div>
-          <div className="absolute bottom-40 left-1/4 w-8 h-1 bg-gradient-to-r from-cyan-400 to-transparent animate-lightning-bolt delay-2000"></div>
+          <div className="absolute top-20 left-20 w-32 h-20 bg-gradient-to-r from-blue-400/30 to-purple-400/30 animate-electric-cloud-1"></div>
+          <div className="absolute top-40 right-32 w-28 h-16 bg-gradient-to-r from-purple-400/25 to-cyan-400/25 animate-electric-cloud-2"></div>
+          <div className="absolute bottom-32 left-40 w-36 h-24 bg-gradient-to-r from-cyan-400/35 to-blue-400/35 animate-electric-cloud-3"></div>
+          <div className="absolute bottom-48 right-20 w-24 h-14 bg-gradient-to-r from-green-400/30 to-purple-400/30 animate-electric-cloud-1"></div>
+          <div className="absolute top-60 left-1/3 w-20 h-12 bg-gradient-to-r from-pink-400/25 to-blue-400/25 animate-electric-cloud-2"></div>
         </div>
         
         {/* Circuit Lines */}
@@ -114,15 +109,9 @@ export default function LandingPage() {
       <div className="relative z-10 min-h-screen flex items-center">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
           <div className="text-center">
-            <div className="mb-8">
-              <Badge className="mb-4 px-4 py-2 text-sm font-medium bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-200 dark:text-blue-300 border border-blue-500/30 backdrop-blur-sm">
-                ⚡ The Future of Event Management
-              </Badge>
-            </div>
-            
             <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold text-gray-900 dark:text-white mb-8 leading-tight">
-              <span className="inline-block animate-glow-text animate-electric-pulse text-gray-800 dark:text-gray-100">Next-Gen</span>
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 bg-clip-text text-transparent block animate-gradient-shift animate-electric-spark">
+              <span className="inline-block animate-glow-text text-gray-800 dark:text-gray-100">Next-Gen</span>
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 bg-clip-text text-transparent block animate-gradient-shift">
                 Event Platform
               </span>
             </h1>
@@ -155,6 +144,16 @@ export default function LandingPage() {
               >
                 <Eye className="mr-3 h-5 w-5" />
                 Browse as Guest
+              </Button>
+              
+              <Button 
+                onClick={() => window.location.href = '/browse'}
+                variant="ghost" 
+                size="lg" 
+                className="text-lg px-10 py-6 text-blue-400 hover:text-blue-300 hover:bg-blue-900/20 transition-all duration-300 backdrop-blur-sm"
+              >
+                Explore Demo
+                <ArrowRight className="ml-3 h-5 w-5" />
               </Button>
             </div>
             

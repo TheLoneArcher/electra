@@ -302,84 +302,86 @@
   animation: circuit-flow-reverse 3s linear infinite;
 }
 
-/* Electric animation effects */
-@keyframes electric-spark {
+/* Electric Cloud animation effects */
+@keyframes electric-cloud-drift {
   0% { 
-    opacity: 0;
-    transform: scale(0.8) rotate(0deg);
-    filter: hue-rotate(0deg);
+    transform: translateX(-20px) translateY(0px) scale(1);
+    opacity: 0.3;
   }
-  20% { 
-    opacity: 1;
-    transform: scale(1.2) rotate(90deg);
-    filter: hue-rotate(60deg);
-  }
-  40% { 
-    opacity: 0.7;
-    transform: scale(0.9) rotate(180deg);
-    filter: hue-rotate(120deg);
-  }
-  60% { 
-    opacity: 1;
-    transform: scale(1.1) rotate(270deg);
-    filter: hue-rotate(180deg);
-  }
-  80% { 
-    opacity: 0.8;
-    transform: scale(1) rotate(360deg);
-    filter: hue-rotate(240deg);
-  }
-  100% { 
-    opacity: 0;
-    transform: scale(0.8) rotate(450deg);
-    filter: hue-rotate(360deg);
-  }
-}
-
-@keyframes electric-pulse {
-  0%, 100% { 
-    box-shadow: 
-      0 0 5px rgba(59, 130, 246, 0.4),
-      0 0 10px rgba(139, 92, 246, 0.3),
-      0 0 15px rgba(34, 197, 94, 0.2);
+  25% { 
+    transform: translateX(10px) translateY(-15px) scale(1.1);
+    opacity: 0.6;
   }
   50% { 
-    box-shadow: 
-      0 0 15px rgba(59, 130, 246, 0.8),
-      0 0 25px rgba(139, 92, 246, 0.6),
-      0 0 35px rgba(34, 197, 94, 0.4);
+    transform: translateX(30px) translateY(5px) scale(0.9);
+    opacity: 0.8;
   }
-}
-
-@keyframes lightning-bolt {
-  0% { 
-    opacity: 0;
-    transform: translateX(-100px) rotate(-45deg);
-  }
-  10% { 
-    opacity: 1;
-    transform: translateX(0) rotate(-45deg);
-  }
-  20% { 
-    opacity: 0;
-    transform: translateX(100px) rotate(-45deg);
+  75% { 
+    transform: translateX(15px) translateY(-10px) scale(1.05);
+    opacity: 0.5;
   }
   100% { 
-    opacity: 0;
-    transform: translateX(100px) rotate(-45deg);
+    transform: translateX(-20px) translateY(0px) scale(1);
+    opacity: 0.3;
   }
 }
 
-.animate-electric-spark {
-  animation: electric-spark 2s ease-in-out infinite;
+@keyframes electric-cloud-glow {
+  0%, 100% { 
+    filter: blur(20px) brightness(1);
+    box-shadow: 
+      0 0 30px rgba(59, 130, 246, 0.3),
+      0 0 60px rgba(139, 92, 246, 0.2),
+      0 0 90px rgba(34, 197, 94, 0.1);
+  }
+  50% { 
+    filter: blur(25px) brightness(1.3);
+    box-shadow: 
+      0 0 50px rgba(59, 130, 246, 0.5),
+      0 0 100px rgba(139, 92, 246, 0.4),
+      0 0 150px rgba(34, 197, 94, 0.3);
+  }
 }
 
-.animate-electric-pulse {
-  animation: electric-pulse 1.5s ease-in-out infinite;
+@keyframes electric-cloud-morph {
+  0% { 
+    border-radius: 50% 40% 60% 30%;
+    transform: rotate(0deg);
+  }
+  25% { 
+    border-radius: 40% 60% 30% 50%;
+    transform: rotate(90deg);
+  }
+  50% { 
+    border-radius: 60% 30% 50% 40%;
+    transform: rotate(180deg);
+  }
+  75% { 
+    border-radius: 30% 50% 40% 60%;
+    transform: rotate(270deg);
+  }
+  100% { 
+    border-radius: 50% 40% 60% 30%;
+    transform: rotate(360deg);
+  }
 }
 
-.animate-lightning-bolt {
-  animation: lightning-bolt 3s ease-in-out infinite;
+.animate-electric-cloud-1 {
+  animation: electric-cloud-drift 8s ease-in-out infinite, 
+             electric-cloud-glow 4s ease-in-out infinite,
+             electric-cloud-morph 12s linear infinite;
+}
+
+.animate-electric-cloud-2 {
+  animation: electric-cloud-drift 10s ease-in-out infinite reverse, 
+             electric-cloud-glow 5s ease-in-out infinite,
+             electric-cloud-morph 15s linear infinite reverse;
+}
+
+.animate-electric-cloud-3 {
+  animation: electric-cloud-drift 12s ease-in-out infinite, 
+             electric-cloud-glow 6s ease-in-out infinite,
+             electric-cloud-morph 18s linear infinite;
 }
 
 /* Cursor Glow Effect */
