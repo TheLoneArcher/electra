@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Heart, Clock, MapPin, Users, Calendar, Check, Music, Briefcase, Palette, Trophy, Coffee, GraduationCap, Gamepad2 } from "lucide-react";
+import { Heart, Clock, MapPin, Users, Calendar, Check, Music, Briefcase, Palette, Trophy, Coffee, GraduationCap, Gamepad2, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -22,6 +22,7 @@ interface EventCardProps {
     price: string;
     isPaid: boolean;
     imageUrl?: string;
+    hostId?: string;
     category?: {
       name: string;
       icon: string;
@@ -86,16 +87,20 @@ export function EventCard({ event }: EventCardProps) {
 
   const favoriteMutation = useMutation({
     mutationFn: async () => {
+      console.log('Toggling favorite for event:', event.id);
       return apiRequest("POST", `/api/events/${event.id}/favorite`, {});
     },
     onSuccess: (data) => {
+      console.log('Favorite toggle success:', data);
       queryClient.invalidateQueries({ queryKey: [`/api/events/${event.id}/favorite`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/events"] });
       toast({
         title: data.favorited ? "Added to Favorites" : "Removed from Favorites",
         description: data.message,
       });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Favorite toggle error:', error);
       toast({
         title: "Error",
         description: "Failed to update favorite. Please try again.",
@@ -134,6 +139,47 @@ export function EventCard({ event }: EventCardProps) {
 
   const eventDate = new Date(event.dateTime);
   const categoryColor = event.category ? categoryColorMap[event.category.color] || "bg-gray-600" : "bg-gray-600";
+  
+  // Check if current user is the event host
+  const isHost = user && event.hostId === user.id;
+  
+  const deleteEventMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("DELETE", `/api/events/${event.id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/events"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/my-hosted-events"] });
+      toast({
+        title: "Event Deleted",
+        description: "Your event has been successfully deleted.",
+      });
+    },
+    onError: (error) => {
+      console.error('Delete event error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete event. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (confirm("Are you sure you want to delete this event? This action cannot be undone.")) {
+      deleteEventMutation.mutate();
+    }
+  };
+
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // TODO: Open edit modal
+    toast({
+      title: "Edit Event",
+      description: "Edit functionality will be available soon.",
+    });
+  };
   
   const getCategoryIcon = (category: any) => {
     if (!category) return Calendar;
@@ -180,18 +226,43 @@ export function EventCard({ event }: EventCardProps) {
             </div>
           )}
           
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-4 right-4 bg-white/90 hover:bg-white"
-            onClick={handleLike}
-          >
-            <Heart 
-              className={`h-4 w-4 ${
-                isLiked ? "fill-red-500 text-red-500" : "text-gray-600"
-              }`} 
-            />
-          </Button>
+          <div className="absolute top-4 right-4 flex gap-2">
+            {isHost && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="bg-white/90 hover:bg-white"
+                  onClick={handleEdit}
+                  data-testid={`button-edit-${event.id}`}
+                >
+                  <Edit className="h-4 w-4 text-blue-600" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="bg-white/90 hover:bg-white"
+                  onClick={handleDelete}
+                  data-testid={`button-delete-${event.id}`}
+                >
+                  <Trash2 className="h-4 w-4 text-red-600" />
+                </Button>
+              </>
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="bg-white/90 hover:bg-white"
+              onClick={handleLike}
+              data-testid={`button-favorite-${event.id}`}
+            >
+              <Heart 
+                className={`h-4 w-4 ${
+                  isLiked ? "fill-red-500 text-red-500" : "text-gray-600"
+                }`} 
+              />
+            </Button>
+          </div>
           
           <div className="absolute bottom-4 left-4 bg-white/90 rounded-lg px-3 py-2">
             <div className="text-center">

@@ -295,6 +295,44 @@ export class MemStorage implements IStorage {
     sampleAnnouncements.forEach(announcement => {
       this.announcements.set(announcement.id, announcement);
     });
+
+    // Initialize sample notifications
+    const sampleNotifications: Notification[] = [
+      {
+        id: "notif-1",
+        userId: "sample-user-1",
+        type: "event_reminder",
+        title: "Event Reminder: Web Development Bootcamp Tomorrow",
+        message: "Don't forget about the Web Development Bootcamp starting tomorrow at 9:00 AM. See you there!",
+        eventId: "event-1",
+        isRead: false,
+        createdAt: new Date()
+      },
+      {
+        id: "notif-2",
+        userId: "sample-user-1", 
+        type: "announcement",
+        title: "Announcement: Workshop Materials Available",
+        message: "All workshop materials and setup instructions have been posted. Please check your email for the downloadable resources.",
+        eventId: "event-1",
+        isRead: false,
+        createdAt: new Date()
+      },
+      {
+        id: "notif-3",
+        userId: "sample-user-1",
+        type: "event_update",
+        title: "Event Update: Contemporary Art Exhibition",
+        message: "Special guest performance by Maria Santos added at 3 PM. Don't miss this exciting addition!",
+        eventId: "event-2",
+        isRead: true,
+        createdAt: new Date()
+      }
+    ];
+
+    sampleNotifications.forEach(notification => {
+      this.notifications.set(notification.id, notification);
+    });
   }
 
   // User methods
@@ -369,11 +407,14 @@ export class MemStorage implements IStorage {
     }
     if (filters?.search) {
       const searchLower = filters.search.toLowerCase();
-      events = events.filter(event => 
-        event.title.toLowerCase().includes(searchLower) ||
-        event.description.toLowerCase().includes(searchLower) ||
-        event.location.toLowerCase().includes(searchLower)
-      );
+      events = events.filter(event => {
+        const matchesTitle = event.title.toLowerCase().includes(searchLower);
+        const matchesDescription = event.description.toLowerCase().includes(searchLower);
+        const matchesLocation = event.location.toLowerCase().includes(searchLower);
+        const matchesTags = event.tags?.some(tag => tag.toLowerCase().includes(searchLower)) || false;
+        
+        return matchesTitle || matchesDescription || matchesLocation || matchesTags;
+      });
     }
 
     return events.sort((a, b) => a.dateTime.getTime() - b.dateTime.getTime());

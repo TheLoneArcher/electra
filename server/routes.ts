@@ -177,20 +177,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/events/:id", async (req, res) => {
+  app.put("/api/events/:id", requireAuth, async (req: any, res) => {
     try {
-      const event = await storage.updateEvent(req.params.id, req.body);
-      if (!event) {
+      const existingEvent = await storage.getEvent(req.params.id);
+      if (!existingEvent) {
         return res.status(404).json({ message: "Event not found" });
       }
+      
+      // Check if user is the host
+      if (existingEvent.hostId !== req.user.id) {
+        return res.status(403).json({ message: "Only event hosts can edit events" });
+      }
+      
+      const validatedData = insertEventSchema.partial().parse({
+        ...req.body,
+        dateTime: req.body.dateTime ? new Date(req.body.dateTime) : undefined,
+      });
+      
+      const event = await storage.updateEvent(req.params.id, validatedData);
       res.json(event);
     } catch (error) {
+      console.error("Event update error:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid event data", errors: error.errors });
+      }
       res.status(500).json({ message: "Failed to update event" });
     }
   });
 
-  app.delete("/api/events/:id", async (req, res) => {
+  app.delete("/api/events/:id", requireAuth, async (req: any, res) => {
     try {
+      const existingEvent = await storage.getEvent(req.params.id);
+      if (!existingEvent) {
+        return res.status(404).json({ message: "Event not found" });
+      }
+      
+      // Check if user is the host
+      if (existingEvent.hostId !== req.user.id) {
+        return res.status(403).json({ message: "Only event hosts can delete events" });
+      }
+      
       const success = await storage.deleteEvent(req.params.id);
       if (!success) {
         return res.status(404).json({ message: "Event not found" });
@@ -570,21 +596,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Notifications
-  app.get("/api/users/:userId/notifications", async (req, res) => {
+  // Hosted events route
+  app.get("/api/my-hosted-events", requireAuth, async (req: any, res) => {
     try {
+      const hostedEvents = await storage.getMyHostedEvents(req.user.id);
+      res.json(hostedEvents);
+    } catch (error) {
+      console.error("Failed to fetch hosted events:", error);
+      res.status(500).json({ message: "Failed to fetch hosted events" });
+    }
+  });
+
+  // Notifications
+  app.get("/api/users/:userId/notifications", requireAuth, async (req: any, res) => {
+    try {
+      // Only allow users to see their own notifications
+      if (req.params.userId !== req.user.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
       const notifications = await storage.getNotifications(req.params.userId);
       res.json(notifications);
     } catch (error) {
+      console.error("Failed to fetch notifications:", error);
       res.status(500).json({ message: "Failed to fetch notifications" });
     }
   });
 
-  app.patch("/api/notifications/:id/read", async (req, res) => {
+  app.patch("/api/notifications/:id/read", requireAuth, async (req: any, res) => {
     try {
       await storage.markNotificationRead(req.params.id);
       res.json({ message: "Notification marked as read" });
     } catch (error) {
+      console.error("Failed to mark notification as read:", error);
       res.status(500).json({ message: "Failed to mark notification as read" });
     }
   });
