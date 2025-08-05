@@ -324,7 +324,7 @@ export default function DashboardPage() {
           <Card className="bg-white dark:bg-gray-800">
             <CardHeader>
               <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">
-                Events I'm Hosting
+                Created Events (Newest First)
               </CardTitle>
             </CardHeader>
             <CardContent>

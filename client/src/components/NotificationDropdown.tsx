@@ -19,7 +19,7 @@ interface Notification {
   id: string;
   title: string;
   message: string;
-  type: 'event_reminder' | 'event_update' | 'event_cancelled' | 'new_rsvp' | 'calendar_sync';
+  type: 'event_reminder' | 'event_update' | 'event_cancelled' | 'new_rsvp' | 'rsvp_update' | 'rsvp_confirmation' | 'calendar_sync';
   eventId?: string;
   isRead: boolean;
   createdAt: string;
@@ -66,7 +66,10 @@ export function NotificationDropdown() {
       case 'event_cancelled':
         return <X className="h-4 w-4 text-red-500" />;
       case 'new_rsvp':
+      case 'rsvp_update':
         return <Users className="h-4 w-4 text-green-500" />;
+      case 'rsvp_confirmation':
+        return <CheckCircle className="h-4 w-4 text-green-600" />;
       case 'calendar_sync':
         return <Calendar className="h-4 w-4 text-purple-500" />;
       default:

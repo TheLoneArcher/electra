@@ -1,9 +1,20 @@
 import { google } from 'googleapis';
 
+// Get the correct redirect URI based on the current environment
+const getRedirectUri = () => {
+  if (process.env.NODE_ENV === 'production' && process.env.REPLIT_DOMAIN) {
+    return `https://${process.env.REPLIT_DOMAIN}/api/calendar/callback`;
+  }
+  // For development or when domain is not available, use the current request's host
+  return process.env.REPLIT_DOMAIN 
+    ? `https://${process.env.REPLIT_DOMAIN}/api/calendar/callback`
+    : 'https://182dd87c-465c-4a94-9c83-04176f5770d9-00-1vxph47kk5vln.sisko.replit.dev/api/calendar/callback';
+};
+
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  process.env.REPLIT_DOMAIN ? `https://${process.env.REPLIT_DOMAIN}/api/calendar/callback` : 'http://localhost:5000/api/calendar/callback'
+  getRedirectUri()
 );
 
 export async function createCalendarEvent(accessToken: string, event: any) {
