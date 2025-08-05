@@ -20,8 +20,9 @@ export function setupAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // Google OAuth Strategy
-  const callbackURL = `https://${process.env.REPLIT_DOMAINS}/api/auth/google/callback`;
+  // Google OAuth Strategy - Fix redirect URI
+  const domain = process.env.REPLIT_DOMAINS || process.env.REPL_SLUG + '.' + process.env.REPL_OWNER + '.repl.co';
+  const callbackURL = `https://${domain}/api/auth/google/callback`;
     
   passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID || '',

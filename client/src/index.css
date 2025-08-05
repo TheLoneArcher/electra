@@ -40,25 +40,25 @@
 }
 
 .dark {
-  --background: hsl(240, 10%, 3.9%);
-  --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(240, 3.7%, 15.9%);
-  --muted-foreground: hsl(240, 5%, 64.9%);
-  --popover: hsl(240, 10%, 3.9%);
-  --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(240, 10%, 3.9%);
-  --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(240, 3.7%, 15.9%);
-  --input: hsl(240, 3.7%, 15.9%);
+  --background: hsl(240, 15%, 7%);
+  --foreground: hsl(0, 0%, 95%);
+  --muted: hsl(240, 10%, 12%);
+  --muted-foreground: hsl(240, 8%, 65%);
+  --popover: hsl(240, 15%, 8%);
+  --popover-foreground: hsl(0, 0%, 95%);
+  --card: hsl(240, 12%, 10%);
+  --card-foreground: hsl(0, 0%, 95%);
+  --border: hsl(240, 8%, 18%);
+  --input: hsl(240, 8%, 18%);
   --primary: hsl(207, 90%, 54%);
-  --primary-foreground: hsl(211, 100%, 99%);
-  --secondary: hsl(240, 3.7%, 15.9%);
-  --secondary-foreground: hsl(0, 0%, 98%);
-  --accent: hsl(240, 3.7%, 15.9%);
-  --accent-foreground: hsl(0, 0%, 98%);
-  --destructive: hsl(0, 62.8%, 30.6%);
-  --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(240, 4.9%, 83.9%);
+  --primary-foreground: hsl(240, 15%, 7%);
+  --secondary: hsl(240, 8%, 18%);
+  --secondary-foreground: hsl(0, 0%, 95%);
+  --accent: hsl(240, 8%, 18%);
+  --accent-foreground: hsl(0, 0%, 95%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 95%);
+  --ring: hsl(207, 90%, 54%);
   --radius: 0.5rem;
 }
 
@@ -122,6 +122,33 @@
   0%, 100% { transform: translate(0, 0) scale(1); }
   33% { transform: translate(20px, -40px) scale(1.2); }
   66% { transform: translate(-30px, 30px) scale(0.8); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 3s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
 }
 
 @keyframes float-4 {

@@ -49,7 +49,7 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-black dark:bg-black relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 dark:bg-black relative overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Grid Pattern */}
@@ -160,7 +160,7 @@ export default function LandingPage() {
       </div>
 
       {/* Features Section */}
-      <div id="features" className="py-32 bg-gray-950 relative">
+      <div id="features" className="py-32 bg-white dark:bg-gray-950 relative">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-950/20 via-purple-950/20 to-cyan-950/20"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-20">
@@ -203,8 +203,15 @@ export default function LandingPage() {
       </div>
 
       {/* Categories Section */}
-      <div className="py-32 bg-black relative">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/50 to-black"></div>
+      <div className="py-32 bg-gray-100 dark:bg-black relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/50 dark:from-blue-900/30 to-black dark:to-purple-900/20"></div>
+        
+        {/* Additional tech elements for dark mode */}
+        <div className="absolute inset-0 hidden dark:block">
+          <div className="absolute top-1/4 left-1/4 w-32 h-32 border border-cyan-500/20 rounded-full animate-spin-slow"></div>
+          <div className="absolute bottom-1/3 right-1/4 w-48 h-48 border border-purple-500/20 rounded-lg rotate-45 animate-pulse"></div>
+          <div className="absolute top-1/2 right-1/3 w-24 h-24 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full animate-bounce-slow"></div>
+        </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">

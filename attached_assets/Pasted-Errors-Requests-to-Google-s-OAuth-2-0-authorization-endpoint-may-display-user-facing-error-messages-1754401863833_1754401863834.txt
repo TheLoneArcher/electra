@@ -1,0 +1,86 @@
+Errors
+Requests to Google's OAuth 2.0 authorization endpoint may display user-facing error messages instead of the expected authentication and authorization flows. Common error codes and suggested resolutions are listed below.
+
+admin_policy_enforced
+The Google Account is unable to authorize one or more scopes requested due to the policies of their Google Workspace administrator. See the Google Workspace Admin help article Control which third-party & internal apps access Google Workspace data for more information about how an administrator may restrict access to all scopes or sensitive and restricted scopes until access is explicitly granted to your OAuth client ID.
+
+disallowed_useragent
+The authorization endpoint is displayed inside an embedded user-agent disallowed by Google's OAuth 2.0 Policies.
+
+Android
+iOS
+Android developers may encounter this error message when opening authorization requests in android.webkit.WebView. Developers should instead use Android libraries such as Google Sign-In for Android or OpenID Foundation's AppAuth for Android.
+
+Web developers may encounter this error when an Android app opens a general web link in an embedded user-agent and a user navigates to Google's OAuth 2.0 authorization endpoint from your site. Developers should allow general links to open in the default link handler of the operating system, which includes both Android App Links handlers or the default browser app. The Android Custom Tabs library is also a supported option.
+
+org_internal
+The OAuth client ID in the request is part of a project limiting access to Google Accounts in a specific Google Cloud Organization. For more information about this configuration option see the User type section in the Setting up your OAuth consent screen help article.
+
+invalid_client
+The OAuth client secret is incorrect. Review the OAuth client configuration, including the client ID and secret used for this request.
+
+deleted_client
+The OAuth client being used to make the request has been deleted. Deletion can happen manually or automatically in the case of unused clients . Deleted clients can be restored within 30 days of the deletion. Learn more .
+
+invalid_grant
+When refreshing an access token or using incremental authorization, the token may have expired or has been invalidated. Authenticate the user again and ask for user consent to obtain new tokens. If you are continuing to see this error, ensure that your application has been configured correctly and that you are using the correct tokens and parameters in your request. Otherwise, the user account may have been deleted or disabled.
+
+redirect_uri_mismatch
+The redirect_uri passed in the authorization request does not match an authorized redirect URI for the OAuth client ID. Review authorized redirect URIs in the Google Cloud Console Clients page.
+
+The redirect_uri parameter may refer to the OAuth out-of-band (OOB) flow that has been deprecated and is no longer supported. Refer to the migration guide to update your integration.
+
+invalid_request
+There was something wrong with the request you made. This could be due to a number of reasons:
+
+The request was not properly formatted
+The request was missing required parameters
+The request uses an authorization method that Google doesn't support. Verify your OAuth integration uses a recommended integration method
+Step 4: Handle the OAuth 2.0 server response
+Important: Before handling the OAuth 2.0 response on the server, you should confirm that the state received from Google matches the state sent in the authorization request. This verification helps to ensure that the user, not a malicious script, is making the request and reduces the risk of CSRF attacks.
+The OAuth 2.0 server responds to your application's access request by using the URL specified in the request.
+
+If the user approves the access request, then the response contains an authorization code. If the user does not approve the request, the response contains an error message. The authorization code or error message that is returned to the web server appears on the query string, as shown below:
+
+An error response:
+
+
+https://oauth2.example.com/auth?error=access_denied
+An authorization code response:
+
+
+https://oauth2.example.com/auth?code=4/P7q7W91a-oMsCeLvIaQm6bTrgtp7
+Important: If your response endpoint renders an HTML page, any resources on that page will be able to see the authorization code in the URL. Scripts can read the URL directly, and the URL in the Referer HTTP header may be sent to any or all resources on the page.
+Carefully consider whether you want to send authorization credentials to all resources on that page (especially third-party scripts such as social plugins and analytics). To avoid this issue, we recommend that the server first handle the request, then redirect to another URL that doesn't include the response parameters.
+
+Sample OAuth 2.0 server response
+You can test this flow by clicking on the following sample URL, which requests read-only access to view metadata for files in your Google Drive and read-only access to view your Google Calendar events:
+
+
+https://accounts.google.com/o/oauth2/v2/auth?
+ scope=https%3A//www.googleapis.com/auth/drive.metadata.readonly%20https%3A//www.googleapis.com/auth/calendar.readonly&
+ access_type=offline&
+ include_granted_scopes=true&
+ response_type=code&
+ state=state_parameter_passthrough_value&
+ redirect_uri=https%3A//oauth2.example.com/code&
+ client_id=client_id
+After completing the OAuth 2.0 flow, you should be redirected to http://localhost/oauth2callback, which will likely yield a 404 NOT FOUND error unless your local machine serves a file at that address. The next step provides more detail about the information returned in the URI when the user is redirected back to your application.
+
+Step 5: Exchange authorization code for refresh and access tokens
+After the web server receives the authorization code, it can exchange the authorization code for an access token.
+
+PHP
+Python
+Ruby
+Node.js
+HTTP/REST
+To exchange an authorization code for an access token, use the fetchAccessTokenWithAuthCode method:
+
+
+$access_token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+Errors
+When exchanging the authorization code for an access token you may encounter the following error instead of the expected response. Common error codes and suggested resolutions are listed below.
+
+invalid_grant
+The supplied authorization code is invalid or in the wrong format. Request a new code by restarting the OAuth process to prompt the user for consent again.
