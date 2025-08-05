@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
 import Navbar from "@/components/Navbar";
 import {
@@ -247,8 +248,10 @@ function PastEventCard({ event, userRsvp }: PastEventCardProps) {
 }
 
 export default function PastEventsPage() {
+  const { user } = useAuth(); // Import and use auth hook
   const { data: userRsvps = [] } = useQuery({
-    queryKey: ["/api/users/sample-user-1/rsvps"],
+    queryKey: ["/api/my-rsvps"], // Use authenticated endpoint
+    enabled: !!user,
   });
 
   const pastEvents = userRsvps?.filter((rsvp: any) => 

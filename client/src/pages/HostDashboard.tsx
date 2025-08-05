@@ -3,10 +3,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { Plus, Megaphone, Camera, TrendingUp, Users, DollarSign } from "lucide-react";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import Navbar from "@/components/Navbar";
 import { CreateEventModal } from "@/components/CreateEventModal";
 
@@ -38,9 +44,18 @@ const generateChartData = (events: any[]) => {
 
 export default function HostDashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [timeRange, setTimeRange] = useState("30");
+  const [selectedEvent, setSelectedEvent] = useState("");
+  const [announcementSubject, setAnnouncementSubject] = useState("");
+  const [announcementMessage, setAnnouncementMessage] = useState("");
+  const [photoUrl, setPhotoUrl] = useState("");
+  const [photoCaption, setPhotoCaption] = useState("");
 
   const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const { data: hostedEvents = [] } = useQuery({
     queryKey: ["/api/my-hosted-events"],
     enabled: !!user,
@@ -216,6 +231,8 @@ export default function HostDashboard() {
                   
                   <Button 
                     variant="outline"
+                    onClick={() => setShowAnnouncementModal(true)}
+                    disabled={hostedEvents.length === 0}
                     className="w-full p-3 font-semibold flex items-center justify-center"
                   >
                     <Megaphone className="h-5 w-5 mr-2" />
@@ -224,6 +241,8 @@ export default function HostDashboard() {
                   
                   <Button 
                     variant="outline"
+                    onClick={() => setShowPhotoModal(true)}
+                    disabled={hostedEvents.length === 0}
                     className="w-full p-3 font-semibold flex items-center justify-center"
                   >
                     <Camera className="h-5 w-5 mr-2" />
@@ -294,6 +313,190 @@ export default function HostDashboard() {
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
       />
+
+      {/* Announcement Modal */}
+      <Dialog open={showAnnouncementModal} onOpenChange={setShowAnnouncementModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Send Announcement</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="event-select">Select Event</Label>
+              <Select value={selectedEvent} onValueChange={setSelectedEvent}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose an event" />
+                </SelectTrigger>
+                <SelectContent>
+                  {hostedEvents.map((event: any) => (
+                    <SelectItem key={event.id} value={event.id}>
+                      {event.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label htmlFor="subject">Subject</Label>
+              <Input
+                id="subject"
+                value={announcementSubject}
+                onChange={(e) => setAnnouncementSubject(e.target.value)}
+                placeholder="Announcement subject"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="message">Message</Label>
+              <Textarea
+                id="message"
+                value={announcementMessage}
+                onChange={(e) => setAnnouncementMessage(e.target.value)}
+                placeholder="Your announcement message..."
+                rows={4}
+              />
+            </div>
+            
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setShowAnnouncementModal(false)} className="flex-1">
+                Cancel
+              </Button>
+              <Button 
+                onClick={async () => {
+                  if (!selectedEvent || !announcementSubject || !announcementMessage) {
+                    toast({
+                      title: "Error",
+                      description: "Please fill in all fields",
+                      variant: "destructive"
+                    });
+                    return;
+                  }
+                  
+                  try {
+                    await apiRequest("POST", `/api/events/${selectedEvent}/announcements`, {
+                      subject: announcementSubject,
+                      message: announcementMessage
+                    });
+                    
+                    toast({
+                      title: "Success",
+                      description: "Announcement sent to all attendees"
+                    });
+                    
+                    setShowAnnouncementModal(false);
+                    setSelectedEvent("");
+                    setAnnouncementSubject("");
+                    setAnnouncementMessage("");
+                  } catch (error) {
+                    toast({
+                      title: "Error",
+                      description: "Failed to send announcement",
+                      variant: "destructive"
+                    });
+                  }
+                }}
+                className="flex-1"
+              >
+                Send Announcement
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Photo Upload Modal */}
+      <Dialog open={showPhotoModal} onOpenChange={setShowPhotoModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Upload Event Photo</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="photo-event-select">Select Event</Label>
+              <Select value={selectedEvent} onValueChange={setSelectedEvent}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose an event" />
+                </SelectTrigger>
+                <SelectContent>
+                  {hostedEvents.map((event: any) => (
+                    <SelectItem key={event.id} value={event.id}>
+                      {event.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label htmlFor="photo-url">Photo URL</Label>
+              <Input
+                id="photo-url"
+                value={photoUrl}
+                onChange={(e) => setPhotoUrl(e.target.value)}
+                placeholder="https://example.com/photo.jpg"
+              />
+              <div className="text-sm text-gray-500 mt-1">
+                Upload your photo to a service like ImgBB or Imgur first
+              </div>
+            </div>
+            
+            <div>
+              <Label htmlFor="photo-caption">Caption (optional)</Label>
+              <Input
+                id="photo-caption"
+                value={photoCaption}
+                onChange={(e) => setPhotoCaption(e.target.value)}
+                placeholder="Photo caption..."
+              />
+            </div>
+            
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setShowPhotoModal(false)} className="flex-1">
+                Cancel
+              </Button>
+              <Button 
+                onClick={async () => {
+                  if (!selectedEvent || !photoUrl) {
+                    toast({
+                      title: "Error",
+                      description: "Please select an event and provide a photo URL",
+                      variant: "destructive"
+                    });
+                    return;
+                  }
+                  
+                  try {
+                    await apiRequest("POST", `/api/events/${selectedEvent}/photos`, {
+                      url: photoUrl,
+                      caption: photoCaption
+                    });
+                    
+                    toast({
+                      title: "Success",
+                      description: "Photo uploaded successfully"
+                    });
+                    
+                    setShowPhotoModal(false);
+                    setSelectedEvent("");
+                    setPhotoUrl("");
+                    setPhotoCaption("");
+                  } catch (error) {
+                    toast({
+                      title: "Error",
+                      description: "Failed to upload photo",
+                      variant: "destructive"
+                    });
+                  }
+                }}
+                className="flex-1"
+              >
+                Upload Photo
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

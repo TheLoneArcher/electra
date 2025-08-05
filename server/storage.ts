@@ -362,7 +362,7 @@ export class MemStorage implements IStorage {
 
   async getMyHostedEvents(hostId: string) {
     return Array.from(this.events.values())
-      .filter(event => event.organizerId === hostId)
+      .filter(event => event.hostId === hostId) // Fixed: use hostId instead of organizerId
       .map(event => ({
         ...event,
         attendingCount: Array.from(this.rsvps.values()).filter(r => r.eventId === event.id && r.status === 'attending').length

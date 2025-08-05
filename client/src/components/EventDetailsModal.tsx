@@ -235,22 +235,15 @@ export function EventDetailsModal({ eventId, isOpen, onClose }: EventDetailsModa
           {/* Attendees */}
           <div>
             <h3 className="text-lg font-semibold mb-2">Who's going</h3>
-            <div className="flex -space-x-2">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <Avatar key={i} className="h-10 w-10 border-2 border-white">
-                  <AvatarImage 
-                    src={`https://i.pravatar.cc/100?img=${i}`} 
-                    alt={`Attendee ${i}`} 
-                  />
-                  <AvatarFallback>A{i}</AvatarFallback>
-                </Avatar>
-              ))}
-              {(event.attendingCount || 0) > 5 && (
-                <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 border-2 border-white flex items-center justify-center text-sm font-medium">
-                  +{(event.attendingCount || 0) - 5}
-                </div>
-              )}
-            </div>
+            {event.attendingCount > 0 ? (
+              <div className="text-gray-600 dark:text-gray-300">
+                {event.attendingCount} {event.attendingCount === 1 ? 'person is' : 'people are'} attending
+              </div>
+            ) : (
+              <div className="text-gray-500 dark:text-gray-400">
+                Be the first to RSVP!
+              </div>
+            )}
           </div>
 
           {/* Reviews */}

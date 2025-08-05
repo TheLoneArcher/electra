@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationDropdown } from "@/components/NotificationDropdown";
+import { CreateEventModal } from "@/components/CreateEventModal";
 
 const navigation = [
   { name: "Browse Events", href: "/" },
@@ -27,6 +28,7 @@ export default function Navbar() {
   const [location] = useLocation();
   const { theme, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const { user, signOut, isAuthenticated, signInWithGoogle } = useAuth();
 
   // Show different navbar for authenticated vs non-authenticated users
@@ -104,6 +106,7 @@ export default function Navbar() {
             <Button 
               variant="default" 
               size="sm" 
+              onClick={() => setShowCreateModal(true)}
               className="hidden sm:flex bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -190,7 +193,13 @@ export default function Navbar() {
                 </div>
                 
                 <nav className="flex flex-col space-y-2 p-4">
-                  <Button className="justify-start mb-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                  <Button 
+                    className="justify-start mb-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                    onClick={() => {
+                      setShowCreateModal(true);
+                      setMobileMenuOpen(false);
+                    }}
+                  >
                     <Plus className="mr-2 h-4 w-4" />
                     Create Event
                   </Button>
@@ -225,6 +234,12 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+      
+      {/* Create Event Modal */}
+      <CreateEventModal 
+        isOpen={showCreateModal} 
+        onClose={() => setShowCreateModal(false)} 
+      />
     </nav>
   );
 }

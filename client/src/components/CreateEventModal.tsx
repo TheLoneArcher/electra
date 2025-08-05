@@ -24,6 +24,7 @@ const createEventSchema = z.object({
   price: z.string().optional(),
   isPaid: z.boolean(),
   tags: z.string().optional(),
+  imageUrl: z.string().optional(),
 });
 
 type CreateEventForm = z.infer<typeof createEventSchema>;
@@ -49,6 +50,7 @@ export function CreateEventModal({ isOpen, onClose }: CreateEventModalProps) {
       price: "0.00",
       isPaid: false,
       tags: "",
+      imageUrl: "",
     },
   });
 
@@ -212,6 +214,28 @@ export function CreateEventModal({ isOpen, onClose }: CreateEventModalProps) {
                   <FormLabel>Tags (comma separated)</FormLabel>
                   <FormControl>
                     <Input placeholder="e.g. networking, tech, beginner" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="imageUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Event Banner</FormLabel>
+                  <FormControl>
+                    <div className="space-y-2">
+                      <Input
+                        placeholder="Enter image URL (optional)"
+                        {...field}
+                      />
+                      <div className="text-sm text-gray-500">
+                        Tip: Use a free image hosting service like ImgBB or Imgur
+                      </div>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
