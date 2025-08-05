@@ -21,8 +21,10 @@ export function setupAuth(app: Express) {
   app.use(passport.session());
 
   // Google OAuth Strategy - Fix redirect URI
-  const domain = process.env.REPLIT_DOMAINS || process.env.REPL_SLUG + '.' + process.env.REPL_OWNER + '.repl.co';
-  const callbackURL = `https://${domain}/api/auth/google/callback`;
+  const domain = process.env.REPLIT_DOMAINS || 'localhost:5000';
+  const callbackURL = domain.includes('localhost') ? `http://${domain}/api/auth/google/callback` : `https://${domain}/api/auth/google/callback`;
+  
+  console.log('Google OAuth callback URL:', callbackURL);
     
   // Only set up Google strategy if credentials are available
   if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
@@ -56,6 +58,8 @@ export function setupAuth(app: Express) {
   } else {
     console.warn('Google OAuth credentials not found. Google authentication will be disabled.');
   }
+  
+  console.log('Google OAuth setup completed. Credentials available:', !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET));
 
   // Serialize user for session
   passport.serializeUser((user: any, done) => {
@@ -78,7 +82,7 @@ export function requireAuth(req: any, res: any, next: any) {
   if (req.isAuthenticated()) {
     return next();
   }
-  res.status(401).json({ message: 'Unauthorized' });
+  res.status(401).json({ message: 'Not authenticated' });
 }
 
 // Middleware to get current user (optional auth)

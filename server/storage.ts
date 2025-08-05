@@ -94,6 +94,7 @@ export class MemStorage implements IStorage {
   constructor() {
     this.initializeCategories();
     this.initializeSampleData();
+    this.initializeSampleAnnouncements();
   }
 
   private initializeCategories() {
@@ -131,6 +132,7 @@ export class MemStorage implements IStorage {
         description: "Join us for an intensive 3-day bootcamp covering modern web development technologies including React, Node.js, and cloud deployment.",
         categoryId: "2",
         organizerId: "sample-user-1",
+        hostId: "sample-user-1",
         location: "Tech Hub, Downtown Campus",
         dateTime: new Date("2025-02-15T09:00:00Z"),
         capacity: 50,
@@ -147,6 +149,7 @@ export class MemStorage implements IStorage {
         description: "Explore the latest works from emerging local artists in this curated exhibition featuring contemporary paintings and digital art.",
         categoryId: "3",
         organizerId: "sample-user-1",
+        hostId: "sample-user-1",
         location: "City Art Gallery, Arts District",
         dateTime: new Date("2025-02-18T18:00:00Z"),
         capacity: 100,
@@ -163,6 +166,7 @@ export class MemStorage implements IStorage {
         description: "A night of amazing indie music featuring local bands and special guest performers. Food trucks and craft beverages available.",
         categoryId: "1",
         organizerId: "sample-user-1",
+        hostId: "sample-user-1",
         location: "Riverside Park Amphitheater",
         dateTime: new Date("2025-02-22T19:00:00Z"),
         capacity: 200,
@@ -257,6 +261,39 @@ export class MemStorage implements IStorage {
 
     sampleEvents.forEach(event => {
       this.events.set(event.id, event);
+    });
+  }
+
+  private initializeSampleAnnouncements() {
+    const sampleAnnouncements: Announcement[] = [
+      {
+        id: "ann-1",
+        eventId: "event-1",
+        hostId: "sample-user-1",
+        subject: "Workshop Materials Available",
+        message: "All workshop materials and setup instructions have been posted. Please check your email for the downloadable resources.",
+        createdAt: new Date()
+      },
+      {
+        id: "ann-2",
+        eventId: "event-1", 
+        hostId: "sample-user-1",
+        subject: "Parking Information Updated",
+        message: "Free parking is available in the Tech Hub lot. Please enter through the north entrance and use your event confirmation for validation.",
+        createdAt: new Date()
+      },
+      {
+        id: "ann-3",
+        eventId: "event-2",
+        hostId: "sample-user-1", 
+        subject: "Special Guest Artist",
+        message: "We are excited to announce a special guest performance by Maria Santos, renowned local sculptor, at 3 PM.",
+        createdAt: new Date()
+      }
+    ];
+
+    sampleAnnouncements.forEach(announcement => {
+      this.announcements.set(announcement.id, announcement);
     });
   }
 

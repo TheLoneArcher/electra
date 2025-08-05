@@ -20,7 +20,7 @@ export function EventDetailsModal({ eventId, isOpen, onClose }: EventDetailsModa
   const queryClient = useQueryClient();
 
   const { data: event, isLoading } = useQuery({
-    queryKey: ["/api/events", eventId],
+    queryKey: [`/api/events/${eventId}`],
     enabled: isOpen && !!eventId,
   });
 
@@ -37,7 +37,8 @@ export function EventDetailsModal({ eventId, isOpen, onClose }: EventDetailsModa
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/events"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/events", eventId] });
+      queryClient.invalidateQueries({ queryKey: [`/api/events/${eventId}`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/my-rsvps"] });
       toast({
         title: "RSVP Updated",
         description: "Your RSVP has been updated successfully.",
@@ -56,11 +57,20 @@ export function EventDetailsModal({ eventId, isOpen, onClose }: EventDetailsModa
     mutationFn: async () => {
       return apiRequest("POST", `/api/events/${eventId}/sync-calendar`, {});
     },
-    onSuccess: () => {
-      toast({
-        title: "Added to Calendar",
-        description: "Event has been synced to your Google Calendar.",
-      });
+    onSuccess: (data) => {
+      if (data.needsAuth && data.authUrl) {
+        // Open authorization window
+        window.open(data.authUrl, '_blank', 'width=500,height=600');
+        toast({
+          title: "Calendar Authorization",
+          description: "Please authorize calendar access in the new window to sync this event.",
+        });
+      } else {
+        toast({
+          title: "Added to Calendar",
+          description: "Event has been synced to your Google Calendar.",
+        });
+      }
     },
     onError: () => {
       toast({

@@ -647,7 +647,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Calendar sync endpoint
+
+
+  // Calendar sync endpoint (legacy)
   app.post("/api/calendar/add-event", async (req, res) => {
     try {
       const { eventId, userId } = req.body;
