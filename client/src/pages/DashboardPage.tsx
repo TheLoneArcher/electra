@@ -10,8 +10,10 @@ import Navbar from "@/components/Navbar";
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("upcoming");
 
+  const { user } = useAuth();
   const { data: userRsvps = [] } = useQuery({
-    queryKey: ["/api/users/sample-user-1/rsvps"],
+    queryKey: ["/api/my-rsvps"],
+    enabled: !!user,
   });
 
   const upcomingEvents = userRsvps?.filter((rsvp: any) => 

@@ -1,11 +1,45 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import passport from 'passport';
 import { storage } from "./storage";
+import { setupAuth, requireAuth, getCurrentUser } from "./auth";
 import { insertEventSchema, insertRsvpSchema, insertEventReviewSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth routes
+  // Setup authentication
+  setupAuth(app);
+
+  // Google OAuth routes
+  app.get('/api/auth/google', 
+    passport.authenticate('google', { scope: ['profile', 'email'] })
+  );
+
+  app.get('/api/auth/google/callback', 
+    passport.authenticate('google', { failureRedirect: '/' }),
+    (req, res) => {
+      res.redirect('/');
+    }
+  );
+
+  app.post('/api/auth/logout', (req, res) => {
+    req.logout((err) => {
+      if (err) {
+        return res.status(500).json({ message: 'Logout failed' });
+      }
+      res.json({ message: 'Logged out successfully' });
+    });
+  });
+
+  app.get('/api/auth/me', (req, res) => {
+    if (req.isAuthenticated()) {
+      res.json({ user: req.user });
+    } else {
+      res.status(401).json({ message: 'Not authenticated' });
+    }
+  });
+
+  // Legacy auth routes (keeping for compatibility)
   app.post("/api/auth/google", async (req, res) => {
     try {
       const { token, user: googleUser } = req.body;
@@ -30,10 +64,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/auth/me", async (req, res) => {
-    // In a real app, get user from session/token
-    // For now, return the sample user
-    const user = await storage.getUser("sample-user-1");
-    res.json({ user });
+    if (req.isAuthenticated && req.isAuthenticated() && req.user) {
+      res.json({ user: req.user });
+    } else {
+      res.status(401).json({ message: "Not authenticated" });
+    }
   });
 
   // Event categories
@@ -113,9 +148,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/events", async (req, res) => {
+  app.post("/api/events", requireAuth, async (req: any, res) => {
     try {
-      const validatedData = insertEventSchema.parse(req.body);
+      const validatedData = insertEventSchema.parse({
+        ...req.body,
+        organizerId: req.user.id, // Set organizer to current user
+      });
       const event = await storage.createEvent(validatedData);
       res.status(201).json(event);
     } catch (error) {
@@ -160,20 +198,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/events/:eventId/rsvp", async (req, res) => {
+  app.post("/api/events/:eventId/rsvp", requireAuth, async (req: any, res) => {
     try {
-      const { userId, status } = req.body;
+      const { status } = req.body;
       
       // Check if RSVP already exists
-      const existingRsvp = await storage.getRsvp(req.params.eventId, userId);
+      const existingRsvp = await storage.getRsvp(req.params.eventId, req.user.id);
       
       if (existingRsvp) {
-        const updatedRsvp = await storage.updateRsvp(req.params.eventId, userId, status);
+        const updatedRsvp = await storage.updateRsvp(req.params.eventId, req.user.id, status);
         res.json(updatedRsvp);
       } else {
         const validatedData = insertRsvpSchema.parse({
           eventId: req.params.eventId,
-          userId,
+          userId: req.user.id,
           status,
         });
         const rsvp = await storage.createRsvp(validatedData);
@@ -199,7 +237,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // User RSVPs
+  // Get current user's RSVP for specific event
+  app.get("/api/events/:eventId/user-rsvp", requireAuth, async (req: any, res) => {
+    try {
+      const rsvp = await storage.getRsvp(req.params.eventId, req.user.id);
+      res.json(rsvp);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user RSVP" });
+    }
+  });
+
+  // Current user's RSVPs
+  app.get("/api/my-rsvps", requireAuth, async (req: any, res) => {
+    try {
+      const rsvps = await storage.getRsvpsByUser(req.user.id);
+      
+      // Enrich with event data
+      const enrichedRsvps = await Promise.all(
+        rsvps.map(async (rsvp) => {
+          const event = await storage.getEvent(rsvp.eventId);
+          const category = event ? await storage.getEventCategory(event.categoryId) : null;
+          return {
+            ...rsvp,
+            event: event ? { ...event, category } : null,
+          };
+        })
+      );
+      
+      res.json(enrichedRsvps);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user RSVPs" });
+    }
+  });
+
+  // User RSVPs (legacy)
   app.get("/api/users/:userId/rsvps", async (req, res) => {
     try {
       const rsvps = await storage.getRsvpsByUser(req.params.userId);

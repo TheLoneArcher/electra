@@ -1,14 +1,15 @@
 import { useState } from "react";
-import { Heart, Clock, MapPin, Users, Calendar } from "lucide-react";
+import { Heart, Clock, MapPin, Users, Calendar, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { format } from "date-fns";
 import { EventDetailsModal } from "./EventDetailsModal";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 interface EventCardProps {
   event: {
@@ -44,19 +45,27 @@ export function EventCard({ event }: EventCardProps) {
   const [showDetails, setShowDetails] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user, isAuthenticated } = useAuth();
+
+  // Get current user's RSVP status
+  const { data: userRsvp } = useQuery({
+    queryKey: [`/api/events/${event.id}/user-rsvp`],
+    enabled: isAuthenticated,
+  });
 
   const rsvpMutation = useMutation({
     mutationFn: async (status: string) => {
       return apiRequest("POST", `/api/events/${event.id}/rsvp`, {
-        userId: "sample-user-1",
         status,
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/events"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/events/${event.id}/user-rsvp`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/my-rsvps"] });
       toast({
         title: "RSVP Updated",
-        description: "Your RSVP has been updated successfully.",
+        description: userRsvp ? "Your RSVP has been updated." : "You've successfully RSVP'd to this event!",
       });
     },
     onError: () => {
@@ -70,8 +79,18 @@ export function EventCard({ event }: EventCardProps) {
 
   const handleRSVP = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!isAuthenticated) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to RSVP to events.",
+        variant: "destructive",
+      });
+      return;
+    }
     rsvpMutation.mutate("attending");
   };
+
+  const isAttending = userRsvp?.status === "attending";
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -173,9 +192,23 @@ export function EventCard({ event }: EventCardProps) {
               <Button
                 onClick={handleRSVP}
                 disabled={rsvpMutation.isPending}
-                className="mt-2 bg-primary hover:bg-primary/90 text-white px-4 py-2 text-sm font-medium"
+                variant={isAttending ? "outline" : "default"}
+                className={`mt-2 px-4 py-2 text-sm font-medium ${
+                  isAttending 
+                    ? "border-green-500 text-green-600 hover:bg-green-50" 
+                    : "bg-primary hover:bg-primary/90 text-white"
+                }`}
               >
-                {rsvpMutation.isPending ? "..." : "RSVP"}
+                {rsvpMutation.isPending ? (
+                  "..."
+                ) : isAttending ? (
+                  <>
+                    <Check className="h-4 w-4 mr-1" />
+                    RSVP'd
+                  </>
+                ) : (
+                  "RSVP"
+                )}
               </Button>
             </div>
           </div>

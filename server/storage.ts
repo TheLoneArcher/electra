@@ -26,6 +26,10 @@ export interface IStorage {
   // Event Categories
   getEventCategories(): Promise<EventCategory[]>;
   getEventCategory(id: string): Promise<EventCategory | undefined>;
+  
+  // Additional user operations
+  getUserByEmail(email: string): Promise<User | undefined>;
+  getEventsByOrganizer(organizerId: string): Promise<Event[]>;
 
   // Events
   getEvents(filters?: { 
@@ -110,7 +114,7 @@ export class MemStorage implements IStorage {
         title: "Web Development Bootcamp 2024",
         description: "Join us for an intensive 3-day bootcamp covering modern web development technologies including React, Node.js, and cloud deployment.",
         categoryId: "2",
-        hostId: "sample-user-1",
+        organizerId: "sample-user-1",
         location: "Tech Hub, Downtown Campus",
         dateTime: new Date("2024-12-15T09:00:00Z"),
         capacity: 50,
@@ -126,7 +130,7 @@ export class MemStorage implements IStorage {
         title: "Contemporary Art Exhibition",
         description: "Explore the latest works from emerging local artists in this curated exhibition featuring contemporary paintings and digital art.",
         categoryId: "3",
-        hostId: "sample-user-1",
+        organizerId: "sample-user-1",
         location: "City Art Gallery, Arts District",
         dateTime: new Date("2024-12-18T18:00:00Z"),
         capacity: 100,
@@ -142,7 +146,7 @@ export class MemStorage implements IStorage {
         title: "Indie Music Festival 2024",
         description: "A night of amazing indie music featuring local bands and special guest performers. Food trucks and craft beverages available.",
         categoryId: "1",
-        hostId: "sample-user-1",
+        organizerId: "sample-user-1",
         location: "Riverside Park Amphitheater",
         dateTime: new Date("2024-12-22T19:00:00Z"),
         capacity: 200,
@@ -195,6 +199,10 @@ export class MemStorage implements IStorage {
     return updatedUser;
   }
 
+  async getEventsByOrganizer(organizerId: string): Promise<Event[]> {
+    return Array.from(this.events.values()).filter(event => event.organizerId === organizerId);
+  }
+
   // Event Categories
   async getEventCategories(): Promise<EventCategory[]> {
     return Array.from(this.eventCategories.values());
@@ -224,7 +232,7 @@ export class MemStorage implements IStorage {
       events = events.filter(event => event.status === filters.status);
     }
     if (filters?.hostId) {
-      events = events.filter(event => event.hostId === filters.hostId);
+      events = events.filter(event => event.organizerId === filters.hostId);
     }
     if (filters?.search) {
       const searchLower = filters.search.toLowerCase();
@@ -266,6 +274,10 @@ export class MemStorage implements IStorage {
 
   async deleteEvent(id: string): Promise<boolean> {
     return this.events.delete(id);
+  }
+
+  async getEventsByHost(hostId: string): Promise<Event[]> {
+    return Array.from(this.events.values()).filter(event => event.organizerId === hostId);
   }
 
   // RSVPs
@@ -371,83 +383,4 @@ export class MemStorage implements IStorage {
 
 export const storage = new MemStorage();
 
-// Add some sample data for development
-(async () => {
-  // Create sample categories
-  await storage.createCategory({
-    name: "Music",
-    icon: "🎵",
-    color: "#FF6B6B"
-  });
-  
-  await storage.createCategory({
-    name: "Sports", 
-    icon: "⚽",
-    color: "#4ECDC4"
-  });
-  
-  await storage.createCategory({
-    name: "Technology",
-    icon: "💻", 
-    color: "#45B7D1"
-  });
-  
-  await storage.createCategory({
-    name: "Food & Drink",
-    icon: "🍕",
-    color: "#96CEB4"
-  });
-  
-  await storage.createCategory({
-    name: "Education",
-    icon: "📚",
-    color: "#FECA57"
-  });
-
-  // Create a sample user
-  const sampleUser = await storage.createUser({
-    name: "John Doe",
-    email: "john@example.com",
-    avatar: null,
-    googleId: null
-  });
-
-  // Create sample events
-  const categories = await storage.getCategories();
-  const musicCategory = categories.find(c => c.name === "Music");
-  const techCategory = categories.find(c => c.name === "Technology");
-  
-  if (musicCategory) {
-    await storage.createEvent({
-      title: "Jazz Night at Central Park",
-      description: "Join us for an evening of smooth jazz under the stars. Local musicians will perform classic and contemporary pieces.",
-      location: "Central Park Bandshell, New York, NY",
-      dateTime: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-      capacity: 200,
-      price: 0,
-      isPaid: false,
-      categoryId: musicCategory.id,
-      organizerId: sampleUser.id,
-      tags: "jazz,music,outdoor,free",
-      imageUrl: null,
-      status: "upcoming"
-    });
-  }
-  
-  if (techCategory) {
-    await storage.createEvent({
-      title: "React.js Workshop",
-      description: "Learn the fundamentals of React.js in this hands-on workshop. Perfect for beginners and intermediate developers.",
-      location: "Tech Hub, 123 Innovation St, San Francisco, CA",
-      dateTime: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
-      capacity: 50,
-      price: 25.00,
-      isPaid: true,
-      categoryId: techCategory.id,
-      organizerId: sampleUser.id,
-      tags: "react,javascript,workshop,programming",
-      imageUrl: null,
-      status: "upcoming"
-    });
-  }
-})().catch(console.error);
+// Categories are initialized in the constructor
