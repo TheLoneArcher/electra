@@ -27,6 +27,11 @@ export default function DashboardPage() {
     enabled: !!user,
   });
 
+  const { data: favoriteEvents = [] } = useQuery({
+    queryKey: ["/api/users", user?.id, "favorites"],
+    enabled: !!user?.id,
+  });
+
   const upcomingEvents = Array.isArray(userRsvps) ? userRsvps.filter((rsvp: any) => 
     rsvp.event && new Date(rsvp.event.dateTime) > new Date() && rsvp.status === "attending"
   ) : [];
@@ -403,11 +408,61 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8">
-                <p className="text-gray-500 dark:text-gray-400">
-                  No favorite events yet. Heart some events to see them here!
-                </p>
-              </div>
+              {Array.isArray(favoriteEvents) && favoriteEvents.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500 dark:text-gray-400">
+                    No favorite events yet. Heart some events to see them here!
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {Array.isArray(favoriteEvents) && favoriteEvents.map((favorite: any) => {
+                    // Get the event data from the favorite
+                    const event = favorite.event;
+                    if (!event) return null;
+                    
+                    return (
+                      <div 
+                        key={favorite.id} 
+                        className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
+                      >
+                        <div className="flex items-center space-x-4">
+                          <div className={`${getCategoryColor(event.category)} rounded-lg p-3`}>
+                            {(() => {
+                              const IconComponent = getCategoryIcon(event.category);
+                              return <IconComponent className="h-5 w-5 text-white" />;
+                            })()}
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-gray-900 dark:text-white">
+                              {event.title}
+                            </h4>
+                            <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 space-x-4">
+                              <span className="flex items-center">
+                                <Clock className="h-4 w-4 mr-1" />
+                                {format(new Date(event.dateTime), "MMM dd, yyyy • h:mm a")}
+                              </span>
+                              <span className="flex items-center">
+                                <MapPin className="h-4 w-4 mr-1" />
+                                {event.location}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => setSelectedEventId(event.id)}
+                          >
+                            View Details
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </CardContent>
           </Card>
         )}

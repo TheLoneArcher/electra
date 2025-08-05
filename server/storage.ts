@@ -440,6 +440,7 @@ export class MemStorage implements IStorage {
       ...insertEvent, 
       status: insertEvent.status || "upcoming",
       imageUrl: insertEvent.imageUrl || null,
+      hostId: insertEvent.hostId || insertEvent.organizerId, // Ensure hostId is set
       id, 
       createdAt: new Date() 
     };
@@ -464,9 +465,9 @@ export class MemStorage implements IStorage {
     return Array.from(this.events.values()).filter(event => event.organizerId === hostId);
   }
 
-  async getMyHostedEvents(hostId: string) {
+  async getMyHostedEvents(userId: string) {
     return Array.from(this.events.values())
-      .filter(event => event.hostId === hostId)
+      .filter(event => event.hostId === userId || event.organizerId === userId)
       .map(event => ({
         ...event,
         attendingCount: Array.from(this.rsvps.values()).filter(r => r.eventId === event.id && r.status === 'attending').length
@@ -614,9 +615,15 @@ export class MemStorage implements IStorage {
   }
 
   // Favorites
-  async getUserFavorites(userId: string): Promise<Favorite[]> {
-    return Array.from(this.favorites.values())
+  async getUserFavorites(userId: string): Promise<any[]> {
+    const userFavorites = Array.from(this.favorites.values())
       .filter(favorite => favorite.userId === userId);
+    
+    // Include event data with each favorite
+    return userFavorites.map(favorite => ({
+      ...favorite,
+      event: this.events.get(favorite.eventId)
+    })).filter(fav => fav.event); // Only include favorites where event still exists
   }
 
   async createFavorite(favorite: InsertFavorite): Promise<Favorite> {
