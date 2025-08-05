@@ -1,0 +1,25 @@
+Prompt:
+Develop a full-stack web-based Event Organizing Platform that allows users to seamlessly create, discover, and participate in local and college-level events. The platform should support Google Sign-In via OAuth 2.0 for secure authentication, enable hosts to post events with detailed information, and allow users to RSVP with an option to sync events to their Google Calendar. Events must be categorized by type, department, and interest, with filtering options for upcoming, ongoing, popular, or paid/unpaid events. After attending, users should be able to rate, review, and upload event images. The system must include a host dashboard with event analytics powered by Chart.js, a calendar interface using FullCalendar.js, and notifications or reminders for upcoming events. A responsive UI/UX design with light/dark mode toggle is expected. The backend should be developed using Python (Flask), with data stored in PostgreSQL, ensuring smooth and scalable event management.
+Create this application with neat UI/UX, Google Sign In, Notifications, Google Calendar Sync, and host analytics for past events, etc, mentioned.
+Event Organizing Platform – Prompt for Development
+Problem Statement:
+How can we build a user-friendly platform that allows individuals and organizations to easily create, discover, and participate in local events and community gatherings?
+
+Objectives:
+Enable users to create, browse, and manage events.
+
+Provide notifications and reminders for upcoming events.
+
+Support RSVP tracking and participant interaction.
+
+Allow filtering and sorting of events by:
+
+Tags: interest, location, conducting department, subject, participants.
+
+Type: paid or unpaid.
+
+Provide a clean and responsive UI/UX with smooth navigation, intuitive layouts, and support for dark/light mode.
+
+Use color codes and icons for easy identification of event types.
+
+Users can create events, RSVP, and see their RSVPs, and get google sign in, and google calendar rsvp event, and give notifications. The participants should have a place where they can see their upcoming events and their past events. The events should also have a rating system and capacity to upload photos.
