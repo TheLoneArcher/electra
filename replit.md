@@ -140,24 +140,30 @@ The schema uses UUID primary keys, proper foreign key relationships, and JSON fi
 
 ## Current Updates (August 2025)
 
-### Event Sorting and Organization
-- **Host Dashboard Events**: Created events now sorted by newest first (createdAt), then by event date
+### Event Management Features
+- **Edit Event Functionality**: Added EditEventModal with full form validation for event updates
+- **Event Sorting and Organization**: Host dashboard events sorted by newest first (createdAt), then by event date
 - **General Event Listing**: All events sorted by creation date (newest first), then by event timing
 - **Hosted Events API**: Enhanced getMyHostedEvents method with proper sorting logic
 
-### Enhanced RSVP Notification System
-- **RSVP Confirmation**: Users now receive detailed confirmation notifications with event timing and location
+### Comprehensive Notification System
+- **RSVP Confirmation**: Users receive detailed confirmation notifications with event timing and location
 - **Host Notifications**: Event hosts receive notifications when someone RSVPs to their events
 - **Calendar Sync Prompts**: Automatic calendar sync notifications sent after RSVP confirmation
-- **Formatted Date/Time**: Notifications include properly formatted event dates and times
+- **Event Reminders**: Automated 24-hour and 1-hour event reminder system with background jobs
+- **Announcement System**: Immediate notifications sent to all attendees for event announcements
+- **Notification Sorting**: All notifications sorted by newest first (createdAt)
+- **Enhanced Message Types**: Added rsvp_confirmation, event_reminder_24h, event_reminder_1h, and calendar_sync notifications
 
-### Improved Google Calendar Integration
-- **Enhanced Calendar Sync**: Updated calendar sync route with better error handling and user feedback
+### Calendar Integration
+- **Event Calendar Component**: Created EventCalendar displaying RSVP'd events in monthly view
+- **Calendar Page**: Added dedicated calendar page accessible via navigation
+- **Google Calendar Sync**: Enhanced calendar sync route with better error handling and user feedback
 - **Event Details in Sync**: Calendar events include comprehensive event information (title, date, time, location)
-- **Sync Status Notifications**: Users receive notifications about calendar sync success/failure
 - **Authorization Flow**: Improved Google Calendar authorization with better user guidance
 
-### Notification System Improvements
-- **Notification Sorting**: All notifications sorted by newest first (createdAt)
-- **Enhanced Message Types**: Added rsvp_confirmation and improved calendar_sync notifications
-- **Better User Experience**: Clearer notification messages with actionable information
+### Enhanced User Interactions
+- **Favorites System**: Fixed heart color changes with proper red color and scale animations
+- **Rate and Review**: Enhanced with proper error handling and validation for past events only
+- **RSVP System**: Improved with immediate confirmations and proper status tracking
+- **Navigation**: Added Calendar link to navbar for easy access to calendar view

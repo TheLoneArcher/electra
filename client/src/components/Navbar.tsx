@@ -23,7 +23,6 @@ const navigation = [
   { name: "Host Dashboard", href: "/host" },
   { name: "Past Events", href: "/past-events" },
   { name: "Calendar", href: "/calendar" },
-  { name: "Calendar", href: "/calendar" },
 ];
 
 export default function Navbar() {
