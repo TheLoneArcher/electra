@@ -40,12 +40,12 @@ export default function LandingPage() {
   ];
 
   const categories = [
-    { icon: Music, name: "Music", color: "bg-blue-100 text-blue-700" },
-    { icon: Code, name: "Technology", color: "bg-green-100 text-green-700" },
-    { icon: Palette, name: "Art", color: "bg-purple-100 text-purple-700" },
-    { icon: Trophy, name: "Sports", color: "bg-red-100 text-red-700" },
-    { icon: GraduationCap, name: "Education", color: "bg-indigo-100 text-indigo-700" },
-    { icon: Utensils, name: "Food", color: "bg-yellow-100 text-yellow-700" }
+    { icon: Music, name: "Music", color: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" },
+    { icon: Code, name: "Technology", color: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" },
+    { icon: Palette, name: "Art", color: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400" },
+    { icon: Trophy, name: "Sports", color: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" },
+    { icon: GraduationCap, name: "Education", color: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400" },
+    { icon: Utensils, name: "Food", color: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400" }
   ];
 
   return (
@@ -96,28 +96,22 @@ export default function LandingPage() {
       <div className="relative z-10 min-h-screen flex items-center">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
           <div className="text-center">
-            <div className="mb-8">
-              <Badge className="mb-4 px-4 py-2 text-sm font-medium bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 border border-blue-500/30 backdrop-blur-sm">
-                ⚡ Real-time Event Management
-              </Badge>
-            </div>
-            
-            <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-8 leading-tight">
-              <span className="inline-block animate-glow-text">Next-Gen</span>
-              <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-cyan-400 bg-clip-text text-transparent block animate-gradient-shift">
-                Event Platform
+            <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold text-gray-900 dark:text-white mb-8 leading-tight">
+              <span className="inline-block">Discover</span>
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 dark:from-blue-400 dark:via-purple-500 dark:to-cyan-400 bg-clip-text text-transparent block">
+                Amazing Events
               </span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
-              Experience the future of event management. Create, discover, and join events with cutting-edge technology and seamless user experience.
+            <p className="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
+              Connect with your community through exciting events, workshops, and gatherings. Create memories, learn new skills, and meet amazing people.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <Button 
                 onClick={handleSignIn}
                 size="lg" 
-                className="group text-lg px-10 py-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 border border-blue-500/30 shadow-2xl hover:shadow-blue-500/25 transform hover:-translate-y-1 transition-all duration-300 backdrop-blur-sm"
+                className="group text-lg px-10 py-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-2xl hover:shadow-blue-500/25 transform hover:-translate-y-1 transition-all duration-300"
               >
                 <svg className="w-5 h-5 mr-3 group-hover:rotate-12 transition-transform" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -133,7 +127,7 @@ export default function LandingPage() {
                 onClick={handleBrowseAsGuest}
                 variant="outline" 
                 size="lg" 
-                className="text-lg px-10 py-6 border-2 border-gray-600/50 text-gray-300 hover:bg-gray-800/50 hover:border-gray-500 transition-all duration-300 backdrop-blur-sm"
+                className="text-lg px-10 py-6 border-2 border-gray-400 dark:border-gray-600/50 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:border-gray-500 transition-all duration-300"
               >
                 <Eye className="mr-3 h-5 w-5" />
                 Browse as Guest
@@ -164,12 +158,12 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-blue-950/20 via-purple-950/20 to-cyan-950/20"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
                 Advanced Features
               </span>
             </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
               Cutting-edge technology stack powering the next generation of event management
             </p>
           </div>
@@ -214,13 +208,13 @@ export default function LandingPage() {
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                Event Universe
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 dark:from-cyan-400 dark:to-blue-400 bg-clip-text text-transparent">
+                Event Categories
               </span>
             </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Explore infinite possibilities across diverse digital communities and tech-driven experiences
+            <p className="text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
+              Discover events across diverse categories that match your interests
             </p>
           </div>
           
@@ -240,7 +234,7 @@ export default function LandingPage() {
                   <div className={`mx-auto w-20 h-20 bg-gradient-to-br ${colors[index % colors.length]} rounded-2xl flex items-center justify-center mb-4 hover:scale-110 hover:rotate-6 transition-all duration-300 cursor-pointer shadow-lg shadow-blue-500/20 group-hover:shadow-2xl group-hover:shadow-blue-500/40`}>
                     <IconComponent className="h-10 w-10 text-white" />
                   </div>
-                  <p className="font-semibold text-white group-hover:text-cyan-400 transition-colors">
+                  <p className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-cyan-400 transition-colors">
                     {category.name}
                   </p>
                 </div>
