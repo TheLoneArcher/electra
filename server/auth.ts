@@ -24,11 +24,13 @@ export function setupAuth(app: Express) {
   const domain = process.env.REPLIT_DOMAINS || process.env.REPL_SLUG + '.' + process.env.REPL_OWNER + '.repl.co';
   const callbackURL = `https://${domain}/api/auth/google/callback`;
     
-  passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID || '',
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-    callbackURL
-  },
+  // Only set up Google strategy if credentials are available
+  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    passport.use(new GoogleStrategy({
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL
+    },
   async (accessToken, refreshToken, profile, done) => {
     try {
       // Check if user exists
@@ -51,6 +53,9 @@ export function setupAuth(app: Express) {
       return done(error, undefined);
     }
   }));
+  } else {
+    console.warn('Google OAuth credentials not found. Google authentication will be disabled.');
+  }
 
   // Serialize user for session
   passport.serializeUser((user: any, done) => {

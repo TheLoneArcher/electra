@@ -7,6 +7,10 @@ The Event Organizing Platform is a full-stack web application that enables users
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+UI Preferences: 
+- Subtle glow effects instead of intense ones
+- Electric animations for visual enhancement
+- Clean dashboard with empty states when no data exists
 
 ## System Architecture
 
@@ -83,3 +87,26 @@ The schema uses UUID primary keys, proper foreign key relationships, and JSON fi
 - **date-fns**: Modern date utility library for formatting and manipulation
 - **recharts**: Composable charting library for analytics dashboards
 - **embla-carousel-react**: Touch-friendly carousel component for image galleries
+
+## Recent Changes (August 2025)
+
+### UI Improvements
+- **Subtle Glow Effects**: Reduced intensity of glow animations by 50% with lower opacity values and longer duration
+- **Electric Animations**: Added electric-spark, electric-pulse, and lightning-bolt animations to landing page for dynamic visual appeal
+- **Dashboard Empty States**: Implemented proper empty state handling for charts and RSVPs when no events are hosted
+
+### Authentication Fix
+- **Google OAuth**: Fixed OAuth strategy initialization to handle missing credentials gracefully without crashing the server
+- **Conditional Setup**: Google authentication now conditionally initializes only when credentials are available
+
+### Data Integrity
+- **Dashboard Analytics**: Replaced mock chart data with dynamic data generation based on actual hosted events
+- **Real-time Updates**: Charts now properly reflect user's actual event data or show empty states appropriately
+
+### Current Issues Addressed
+- ✅ Glow effects made more subtle
+- ✅ Electric animations added to landing page
+- ✅ Dashboard shows empty states when no events hosted
+- ✅ OAuth error fixed
+- 🔄 Google Calendar API sync (requires user setup)
+- 🔄 Notification system (basic infrastructure in place)

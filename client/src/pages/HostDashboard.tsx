@@ -10,52 +10,31 @@ import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
 import { CreateEventModal } from "@/components/CreateEventModal";
 
-// Mock data for charts
-const rsvpData = [
-  { name: "Week 1", rsvps: 12 },
-  { name: "Week 2", rsvps: 19 },
-  { name: "Week 3", rsvps: 25 },
-  { name: "Week 4", rsvps: 31 },
-];
+// Helper function to generate chart data from real events
+const generateChartData = (events: any[]) => {
+  if (!events || events.length === 0) {
+    return {
+      rsvpData: [],
+      eventPerformanceData: [],
+      recentRsvps: []
+    };
+  }
 
-const eventPerformanceData = [
-  { name: "Jan", events: 4, attendance: 85 },
-  { name: "Feb", events: 6, attendance: 92 },
-  { name: "Mar", events: 5, attendance: 78 },
-  { name: "Apr", events: 8, attendance: 88 },
-  { name: "May", events: 7, attendance: 96 },
-];
+  // Generate RSVP data based on real events
+  const rsvpData = events.slice(0, 4).map((event, index) => ({
+    name: `Week ${index + 1}`,
+    rsvps: event.attendingCount || 0
+  }));
 
-const recentRsvps = [
-  {
-    id: 1,
-    name: "Sarah K.",
-    avatar: "https://i.pravatar.cc/100?img=1",
-    status: "RSVP'd",
-    time: "2 mins ago"
-  },
-  {
-    id: 2,
-    name: "Mike R.",
-    avatar: "https://i.pravatar.cc/100?img=2",
-    status: "RSVP'd",
-    time: "5 mins ago"
-  },
-  {
-    id: 3,
-    name: "Emma L.",
-    avatar: "https://i.pravatar.cc/100?img=3",
-    status: "Cancelled",
-    time: "10 mins ago"
-  },
-  {
-    id: 4,
-    name: "Alex M.",
-    avatar: "https://i.pravatar.cc/100?img=4",
-    status: "RSVP'd",
-    time: "15 mins ago"
-  },
-];
+  // Generate performance data based on real events  
+  const eventPerformanceData = events.slice(0, 5).map((event, index) => ({
+    name: new Date(event.dateTime).toLocaleDateString('en', { month: 'short' }) || `Month ${index + 1}`,
+    events: 1,
+    attendance: Math.round((event.attendingCount / event.capacity) * 100) || 0
+  }));
+
+  return { rsvpData, eventPerformanceData, recentRsvps: [] };
+};
 
 export default function HostDashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -69,18 +48,22 @@ export default function HostDashboard() {
 
   const totalAttendees = Array.isArray(hostedEvents) ? hostedEvents.reduce((total: number, event: any) => total + (event.attendingCount || 0), 0) : 0;
   const totalRevenue = Array.isArray(hostedEvents) ? hostedEvents.reduce((total: number, event: any) => total + (parseFloat(event.price || "0") * (event.attendingCount || 0)), 0) : 0;
+  const avgAttendanceRate = hostedEvents.length > 0 ? Math.round(hostedEvents.reduce((total: number, event: any) => total + ((event.attendingCount || 0) / (event.capacity || 1) * 100), 0) / hostedEvents.length) : 0;
+
+  // Generate chart data from real events
+  const { rsvpData, eventPerformanceData, recentRsvps } = generateChartData(hostedEvents);
 
   const metrics = [
     {
       title: "Attendance Rate",
-      value: "68%",
+      value: hostedEvents.length > 0 ? `${avgAttendanceRate}%` : "0%",
       icon: TrendingUp,
       color: "text-primary",
       bgColor: "bg-blue-100 dark:bg-blue-900",
     },
     {
-      title: "Avg Rating",
-      value: "4.8",
+      title: "Total Events",
+      value: hostedEvents.length.toString(),
       icon: Users,
       color: "text-green-600 dark:text-green-400",
       bgColor: "bg-green-100 dark:bg-green-900",
@@ -133,20 +116,30 @@ export default function HostDashboard() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <ResponsiveContainer width="100%" height={250}>
-                      <LineChart data={rsvpData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip />
-                        <Line 
-                          type="monotone" 
-                          dataKey="rsvps" 
-                          stroke="hsl(207, 90%, 54%)" 
-                          strokeWidth={2}
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
+                    {rsvpData.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={250}>
+                        <LineChart data={rsvpData}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="name" />
+                          <YAxis />
+                          <Tooltip />
+                          <Line 
+                            type="monotone" 
+                            dataKey="rsvps" 
+                            stroke="hsl(207, 90%, 54%)" 
+                            strokeWidth={2}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="h-[250px] flex items-center justify-center text-gray-500 dark:text-gray-400">
+                        <div className="text-center">
+                          <Users className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                          <p className="text-lg font-medium">No RSVP data yet</p>
+                          <p className="text-sm">Create your first event to see analytics</p>
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 
@@ -179,16 +172,26 @@ export default function HostDashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={eventPerformanceData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="events" fill="hsl(207, 90%, 54%)" />
-                    <Bar dataKey="attendance" fill="hsl(151, 55%, 42%)" />
-                  </BarChart>
-                </ResponsiveContainer>
+                {eventPerformanceData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={eventPerformanceData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="events" fill="hsl(207, 90%, 54%)" />
+                      <Bar dataKey="attendance" fill="hsl(151, 55%, 42%)" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-[300px] flex items-center justify-center text-gray-500 dark:text-gray-400">
+                    <div className="text-center">
+                      <TrendingUp className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                      <p className="text-lg font-medium">No performance data</p>
+                      <p className="text-sm">Host events to view monthly performance analytics</p>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -233,35 +236,42 @@ export default function HostDashboard() {
                   <h4 className="font-semibold text-gray-900 dark:text-white mb-3">
                     Recent RSVPs
                   </h4>
-                  <div className="space-y-3">
-                    {recentRsvps.map((rsvp) => (
-                      <div key={rsvp.id} className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage src={rsvp.avatar} alt={rsvp.name} />
-                            <AvatarFallback>
-                              {rsvp.name.split(" ").map(n => n[0]).join("")}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <span className="text-sm font-medium text-gray-900 dark:text-white">
-                              {rsvp.name}
-                            </span>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {rsvp.time}
-                            </p>
+                  {recentRsvps.length > 0 ? (
+                    <div className="space-y-3">
+                      {recentRsvps.map((rsvp) => (
+                        <div key={rsvp.id} className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={rsvp.avatar} alt={rsvp.name} />
+                              <AvatarFallback>
+                                {rsvp.name.split(" ").map(n => n[0]).join("")}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <span className="text-sm font-medium text-gray-900 dark:text-white">
+                                {rsvp.name}
+                              </span>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                {rsvp.time}
+                              </p>
+                            </div>
                           </div>
+                          <span className={`text-xs px-2 py-1 rounded-full ${
+                            rsvp.status === "RSVP'd" 
+                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" 
+                              : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                          }`}>
+                            {rsvp.status}
+                          </span>
                         </div>
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          rsvp.status === "RSVP'd" 
-                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" 
-                            : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                        }`}>
-                          {rsvp.status}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                      <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                      <p className="text-sm">No recent RSVPs yet</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Host Tips */}

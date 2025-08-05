@@ -68,13 +68,18 @@ export default function LandingPage() {
         {/* Grid Pattern */}
         <div className="absolute inset-0 bg-tech-grid opacity-20 animate-pulse-slow"></div>
         
-        {/* Floating Particles */}
+        {/* Electric Particles */}
         <div className="absolute inset-0">
-          <div className="particle-1 absolute w-2 h-2 bg-blue-400 rounded-full animate-float-1"></div>
-          <div className="particle-2 absolute w-1 h-1 bg-purple-400 rounded-full animate-float-2"></div>
-          <div className="particle-3 absolute w-3 h-3 bg-cyan-400 rounded-full animate-float-3"></div>
-          <div className="particle-4 absolute w-1.5 h-1.5 bg-green-400 rounded-full animate-float-4"></div>
-          <div className="particle-5 absolute w-2.5 h-2.5 bg-pink-400 rounded-full animate-float-5"></div>
+          <div className="particle-1 absolute w-2 h-2 bg-blue-400 rounded-full animate-float-1 animate-electric-spark"></div>
+          <div className="particle-2 absolute w-1 h-1 bg-purple-400 rounded-full animate-float-2 animate-electric-pulse"></div>
+          <div className="particle-3 absolute w-3 h-3 bg-cyan-400 rounded-full animate-float-3 animate-electric-spark"></div>
+          <div className="particle-4 absolute w-1.5 h-1.5 bg-green-400 rounded-full animate-float-4 animate-electric-pulse"></div>
+          <div className="particle-5 absolute w-2.5 h-2.5 bg-pink-400 rounded-full animate-float-5 animate-electric-spark"></div>
+          
+          {/* Lightning bolts */}
+          <div className="absolute top-20 left-10 w-8 h-1 bg-gradient-to-r from-blue-400 to-transparent animate-lightning-bolt"></div>
+          <div className="absolute top-40 right-20 w-8 h-1 bg-gradient-to-r from-purple-400 to-transparent animate-lightning-bolt delay-1000"></div>
+          <div className="absolute bottom-40 left-1/4 w-8 h-1 bg-gradient-to-r from-cyan-400 to-transparent animate-lightning-bolt delay-2000"></div>
         </div>
         
         {/* Circuit Lines */}
@@ -116,8 +121,8 @@ export default function LandingPage() {
             </div>
             
             <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold text-gray-900 dark:text-white mb-8 leading-tight">
-              <span className="inline-block animate-glow-text text-gray-800 dark:text-gray-100">Next-Gen</span>
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 bg-clip-text text-transparent block animate-gradient-shift">
+              <span className="inline-block animate-glow-text animate-electric-pulse text-gray-800 dark:text-gray-100">Next-Gen</span>
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 bg-clip-text text-transparent block animate-gradient-shift animate-electric-spark">
                 Event Platform
               </span>
             </h1>

@@ -143,82 +143,82 @@
   animation: spin-slow 8s linear infinite;
 }
 
-/* Enhanced glow effects */
+/* Subtle glow effects */
 .glow {
   box-shadow: 
-    0 0 30px rgba(59, 130, 246, 0.8), 
-    0 0 60px rgba(59, 130, 246, 0.6), 
-    0 0 90px rgba(59, 130, 246, 0.4),
-    inset 0 0 30px rgba(59, 130, 246, 0.2);
-  animation: pulse-glow 2s ease-in-out infinite alternate;
+    0 0 15px rgba(59, 130, 246, 0.3), 
+    0 0 25px rgba(59, 130, 246, 0.2), 
+    0 0 35px rgba(59, 130, 246, 0.1),
+    inset 0 0 10px rgba(59, 130, 246, 0.1);
+  animation: pulse-glow 3s ease-in-out infinite alternate;
 }
 
 .glow-purple {
   box-shadow: 
-    0 0 30px rgba(139, 92, 246, 0.8), 
-    0 0 60px rgba(139, 92, 246, 0.6), 
-    0 0 90px rgba(139, 92, 246, 0.4),
-    inset 0 0 30px rgba(139, 92, 246, 0.2);
-  animation: pulse-glow-purple 2s ease-in-out infinite alternate;
+    0 0 15px rgba(139, 92, 246, 0.3), 
+    0 0 25px rgba(139, 92, 246, 0.2), 
+    0 0 35px rgba(139, 92, 246, 0.1),
+    inset 0 0 10px rgba(139, 92, 246, 0.1);
+  animation: pulse-glow-purple 3s ease-in-out infinite alternate;
 }
 
 .glow-green {
   box-shadow: 
-    0 0 30px rgba(34, 197, 94, 0.8), 
-    0 0 60px rgba(34, 197, 94, 0.6), 
-    0 0 90px rgba(34, 197, 94, 0.4),
-    inset 0 0 30px rgba(34, 197, 94, 0.2);
-  animation: pulse-glow-green 2s ease-in-out infinite alternate;
+    0 0 15px rgba(34, 197, 94, 0.3), 
+    0 0 25px rgba(34, 197, 94, 0.2), 
+    0 0 35px rgba(34, 197, 94, 0.1),
+    inset 0 0 10px rgba(34, 197, 94, 0.1);
+  animation: pulse-glow-green 3s ease-in-out infinite alternate;
 }
 
 @keyframes pulse-glow {
   0% {
     box-shadow: 
-      0 0 30px rgba(59, 130, 246, 0.8), 
-      0 0 60px rgba(59, 130, 246, 0.6), 
-      0 0 90px rgba(59, 130, 246, 0.4),
-      inset 0 0 30px rgba(59, 130, 246, 0.2);
+      0 0 15px rgba(59, 130, 246, 0.3), 
+      0 0 25px rgba(59, 130, 246, 0.2), 
+      0 0 35px rgba(59, 130, 246, 0.1),
+      inset 0 0 10px rgba(59, 130, 246, 0.1);
   }
   100% {
     box-shadow: 
-      0 0 50px rgba(59, 130, 246, 1), 
-      0 0 100px rgba(59, 130, 246, 0.8), 
-      0 0 150px rgba(59, 130, 246, 0.6),
-      inset 0 0 50px rgba(59, 130, 246, 0.3);
+      0 0 20px rgba(59, 130, 246, 0.4), 
+      0 0 35px rgba(59, 130, 246, 0.3), 
+      0 0 50px rgba(59, 130, 246, 0.2),
+      inset 0 0 15px rgba(59, 130, 246, 0.15);
   }
 }
 
 @keyframes pulse-glow-purple {
   0% {
     box-shadow: 
-      0 0 30px rgba(139, 92, 246, 0.8), 
-      0 0 60px rgba(139, 92, 246, 0.6), 
-      0 0 90px rgba(139, 92, 246, 0.4),
-      inset 0 0 30px rgba(139, 92, 246, 0.2);
+      0 0 15px rgba(139, 92, 246, 0.3), 
+      0 0 25px rgba(139, 92, 246, 0.2), 
+      0 0 35px rgba(139, 92, 246, 0.1),
+      inset 0 0 10px rgba(139, 92, 246, 0.1);
   }
   100% {
     box-shadow: 
-      0 0 50px rgba(139, 92, 246, 1), 
-      0 0 100px rgba(139, 92, 246, 0.8), 
-      0 0 150px rgba(139, 92, 246, 0.6),
-      inset 0 0 50px rgba(139, 92, 246, 0.3);
+      0 0 20px rgba(139, 92, 246, 0.4), 
+      0 0 35px rgba(139, 92, 246, 0.3), 
+      0 0 50px rgba(139, 92, 246, 0.2),
+      inset 0 0 15px rgba(139, 92, 246, 0.15);
   }
 }
 
 @keyframes pulse-glow-green {
   0% {
     box-shadow: 
-      0 0 30px rgba(34, 197, 94, 0.8), 
-      0 0 60px rgba(34, 197, 94, 0.6), 
-      0 0 90px rgba(34, 197, 94, 0.4),
-      inset 0 0 30px rgba(34, 197, 94, 0.2);
+      0 0 15px rgba(34, 197, 94, 0.3), 
+      0 0 25px rgba(34, 197, 94, 0.2), 
+      0 0 35px rgba(34, 197, 94, 0.1),
+      inset 0 0 10px rgba(34, 197, 94, 0.1);
   }
   100% {
     box-shadow: 
-      0 0 50px rgba(34, 197, 94, 1), 
-      0 0 100px rgba(34, 197, 94, 0.8), 
-      0 0 150px rgba(34, 197, 94, 0.6),
-      inset 0 0 50px rgba(34, 197, 94, 0.3);
+      0 0 20px rgba(34, 197, 94, 0.4), 
+      0 0 35px rgba(34, 197, 94, 0.3), 
+      0 0 50px rgba(34, 197, 94, 0.2),
+      inset 0 0 15px rgba(34, 197, 94, 0.15);
   }
 }
 
@@ -300,6 +300,86 @@
 .animate-circuit-flow-reverse {
   stroke-dasharray: 5 5;
   animation: circuit-flow-reverse 3s linear infinite;
+}
+
+/* Electric animation effects */
+@keyframes electric-spark {
+  0% { 
+    opacity: 0;
+    transform: scale(0.8) rotate(0deg);
+    filter: hue-rotate(0deg);
+  }
+  20% { 
+    opacity: 1;
+    transform: scale(1.2) rotate(90deg);
+    filter: hue-rotate(60deg);
+  }
+  40% { 
+    opacity: 0.7;
+    transform: scale(0.9) rotate(180deg);
+    filter: hue-rotate(120deg);
+  }
+  60% { 
+    opacity: 1;
+    transform: scale(1.1) rotate(270deg);
+    filter: hue-rotate(180deg);
+  }
+  80% { 
+    opacity: 0.8;
+    transform: scale(1) rotate(360deg);
+    filter: hue-rotate(240deg);
+  }
+  100% { 
+    opacity: 0;
+    transform: scale(0.8) rotate(450deg);
+    filter: hue-rotate(360deg);
+  }
+}
+
+@keyframes electric-pulse {
+  0%, 100% { 
+    box-shadow: 
+      0 0 5px rgba(59, 130, 246, 0.4),
+      0 0 10px rgba(139, 92, 246, 0.3),
+      0 0 15px rgba(34, 197, 94, 0.2);
+  }
+  50% { 
+    box-shadow: 
+      0 0 15px rgba(59, 130, 246, 0.8),
+      0 0 25px rgba(139, 92, 246, 0.6),
+      0 0 35px rgba(34, 197, 94, 0.4);
+  }
+}
+
+@keyframes lightning-bolt {
+  0% { 
+    opacity: 0;
+    transform: translateX(-100px) rotate(-45deg);
+  }
+  10% { 
+    opacity: 1;
+    transform: translateX(0) rotate(-45deg);
+  }
+  20% { 
+    opacity: 0;
+    transform: translateX(100px) rotate(-45deg);
+  }
+  100% { 
+    opacity: 0;
+    transform: translateX(100px) rotate(-45deg);
+  }
+}
+
+.animate-electric-spark {
+  animation: electric-spark 2s ease-in-out infinite;
+}
+
+.animate-electric-pulse {
+  animation: electric-pulse 1.5s ease-in-out infinite;
+}
+
+.animate-lightning-bolt {
+  animation: lightning-bolt 3s ease-in-out infinite;
 }
 
 /* Cursor Glow Effect */
