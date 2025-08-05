@@ -11,7 +11,11 @@ import {
   type EventPhoto,
   type InsertEventPhoto,
   type Notification,
-  type InsertNotification
+  type InsertNotification,
+  type Announcement,
+  type InsertAnnouncement,
+  type Favorite,
+  type InsertFavorite
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -64,6 +68,16 @@ export interface IStorage {
   getNotifications(userId: string): Promise<Notification[]>;
   createNotification(notification: InsertNotification): Promise<Notification>;
   markNotificationRead(id: string): Promise<void>;
+
+  // Announcements
+  getEventAnnouncements(eventId: string): Promise<Announcement[]>;
+  createAnnouncement(announcement: InsertAnnouncement): Promise<Announcement>;
+
+  // Favorites
+  getUserFavorites(userId: string): Promise<Favorite[]>;
+  createFavorite(favorite: InsertFavorite): Promise<Favorite>;
+  deleteFavorite(userId: string, eventId: string): Promise<boolean>;
+  isFavorited(userId: string, eventId: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -74,6 +88,8 @@ export class MemStorage implements IStorage {
   private eventReviews: Map<string, EventReview> = new Map();
   private eventPhotos: Map<string, EventPhoto> = new Map();
   private notifications: Map<string, Notification> = new Map();
+  private announcements: Map<string, Announcement> = new Map();
+  private favorites: Map<string, Favorite> = new Map();
 
   constructor() {
     this.initializeCategories();
@@ -483,6 +499,55 @@ export class MemStorage implements IStorage {
     if (notification) {
       this.notifications.set(id, { ...notification, isRead: true });
     }
+  }
+
+  // Announcements
+  async getEventAnnouncements(eventId: string): Promise<Announcement[]> {
+    return Array.from(this.announcements.values())
+      .filter(announcement => announcement.eventId === eventId)
+      .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+  }
+
+  async createAnnouncement(announcement: InsertAnnouncement): Promise<Announcement> {
+    const newAnnouncement: Announcement = {
+      ...announcement,
+      id: randomUUID(),
+      createdAt: new Date(),
+    };
+    this.announcements.set(newAnnouncement.id, newAnnouncement);
+    return newAnnouncement;
+  }
+
+  // Favorites
+  async getUserFavorites(userId: string): Promise<Favorite[]> {
+    return Array.from(this.favorites.values())
+      .filter(favorite => favorite.userId === userId);
+  }
+
+  async createFavorite(favorite: InsertFavorite): Promise<Favorite> {
+    const newFavorite: Favorite = {
+      ...favorite,
+      id: randomUUID(),
+      createdAt: new Date(),
+    };
+    this.favorites.set(newFavorite.id, newFavorite);
+    return newFavorite;
+  }
+
+  async deleteFavorite(userId: string, eventId: string): Promise<boolean> {
+    const favorite = Array.from(this.favorites.values())
+      .find(f => f.userId === userId && f.eventId === eventId);
+    
+    if (favorite) {
+      this.favorites.delete(favorite.id);
+      return true;
+    }
+    return false;
+  }
+
+  async isFavorited(userId: string, eventId: string): Promise<boolean> {
+    return Array.from(this.favorites.values())
+      .some(f => f.userId === userId && f.eventId === eventId);
   }
 }
 

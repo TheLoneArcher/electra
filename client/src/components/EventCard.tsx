@@ -41,7 +41,6 @@ const categoryColorMap: Record<string, string> = {
 };
 
 export function EventCard({ event }: EventCardProps) {
-  const [isLiked, setIsLiked] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -52,6 +51,14 @@ export function EventCard({ event }: EventCardProps) {
     queryKey: [`/api/events/${event.id}/user-rsvp`],
     enabled: isAuthenticated,
   });
+
+  // Get favorite status
+  const { data: favoriteData } = useQuery({
+    queryKey: [`/api/events/${event.id}/favorite`],
+    enabled: isAuthenticated,
+  });
+
+  const isLiked = favoriteData?.favorited || false;
 
   const rsvpMutation = useMutation({
     mutationFn: async (status: string) => {
@@ -77,6 +84,26 @@ export function EventCard({ event }: EventCardProps) {
     },
   });
 
+  const favoriteMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("POST", `/api/events/${event.id}/favorite`, {});
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: [`/api/events/${event.id}/favorite`] });
+      toast({
+        title: data.favorited ? "Added to Favorites" : "Removed from Favorites",
+        description: data.message,
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update favorite. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleRSVP = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!isAuthenticated) {
@@ -94,7 +121,15 @@ export function EventCard({ event }: EventCardProps) {
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsLiked(!isLiked);
+    if (!isAuthenticated) {
+      toast({
+        title: "Sign in Required",
+        description: "Please sign in to favorite events.",
+        variant: "destructive",
+      });
+      return;
+    }
+    favoriteMutation.mutate();
   };
 
   const eventDate = new Date(event.dateTime);

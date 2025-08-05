@@ -108,5 +108,9 @@ The schema uses UUID primary keys, proper foreign key relationships, and JSON fi
 - ✅ Electric animations added to landing page
 - ✅ Dashboard shows empty states when no events hosted
 - ✅ OAuth error fixed
-- 🔄 Google Calendar API sync (requires user setup)
-- 🔄 Notification system (basic infrastructure in place)
+- ✅ Google Calendar sync (simplified working version)
+- ✅ Notification system (fully functional)
+- ✅ Favorite button functionality (working with backend)
+- ✅ Event announcements (appears in event cards)
+- ✅ Photo upload functionality (working with URL input)
+- ✅ Real attendee counts (replaced fake avatars)

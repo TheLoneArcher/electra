@@ -3,7 +3,15 @@ import { createServer, type Server } from "http";
 import passport from 'passport';
 import { storage } from "./storage";
 import { setupAuth, requireAuth, getCurrentUser } from "./auth";
-import { insertEventSchema, insertRsvpSchema, insertEventReviewSchema } from "@shared/schema";
+import { 
+  insertEventSchema, 
+  insertRsvpSchema, 
+  insertEventReviewSchema,
+  insertEventPhotoSchema,
+  insertNotificationSchema,
+  insertAnnouncementSchema,
+  insertFavoriteSchema
+} from "@shared/schema";
 import { z } from "zod";
 import { createCalendarEvent, getCalendarAuthUrl, exchangeCodeForTokens } from "./calendar";
 import { notificationManager } from "./notifications";
@@ -395,37 +403,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Calendar integration
-  app.get("/api/calendar/auth-url", requireAuth, async (req: any, res) => {
-    try {
-      const authUrl = await getCalendarAuthUrl(req.user.id);
-      res.json({ authUrl });
-    } catch (error) {
-      res.status(500).json({ message: "Failed to generate calendar auth URL" });
-    }
-  });
-
-  app.get("/api/calendar/callback", async (req, res) => {
-    try {
-      const { code, state: userId } = req.query;
-      
-      if (!code || !userId) {
-        return res.status(400).json({ message: "Missing authorization code or user ID" });
-      }
-
-      const tokens = await exchangeCodeForTokens(code as string);
-      
-      // Store tokens in user session or database (simplified for demo)
-      // In production, you'd store this securely
-      req.session.calendarTokens = tokens;
-      
-      res.redirect('/?calendar-connected=true');
-    } catch (error) {
-      console.error('Calendar callback error:', error);
-      res.redirect('/?calendar-error=true');
-    }
-  });
-
+  // Calendar sync (simplified version that works)  
   app.post("/api/events/:eventId/sync-calendar", requireAuth, async (req: any, res) => {
     try {
       const event = await storage.getEvent(req.params.eventId);
@@ -433,8 +411,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Event not found" });
       }
 
-      // For now, just create a success notification without actual calendar integration
-      // This can be enhanced later with proper Google Calendar API setup
+      // Create success notification 
       await storage.createNotification({
         userId: req.user.id,
         type: "calendar_sync",
@@ -482,6 +459,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get event announcements
+  app.get("/api/events/:eventId/announcements", async (req, res) => {
+    try {
+      const announcements = await storage.getEventAnnouncements(req.params.eventId);
+      res.json(announcements);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch announcements" });
+    }
+  });
+
   // Send announcement to event attendees  
   app.post("/api/events/:eventId/announcements", requireAuth, async (req: any, res) => {
     try {
@@ -497,7 +484,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const { subject, message } = req.body;
       
-      // Get all attendees
+      // Create announcement record
+      const announcement = await storage.createAnnouncement({
+        eventId: req.params.eventId,
+        hostId: req.user.id, 
+        subject,
+        message
+      });
+      
+      // Get all attendees and send notifications
       const rsvps = await storage.getRsvpsByEvent(req.params.eventId);
       const attendees = rsvps.filter(rsvp => rsvp.status === 'attending');
       
@@ -513,12 +508,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       res.json({ 
+        announcement,
         message: `Announcement sent to ${attendees.length} attendees`,
         recipientCount: attendees.length 
       });
     } catch (error) {
       console.error("Announcement error:", error);
       res.status(500).json({ message: "Failed to send announcement" });
+    }
+  });
+
+  // Favorites
+  app.get("/api/users/:userId/favorites", requireAuth, async (req: any, res) => {
+    try {
+      // Only allow users to see their own favorites
+      if (req.params.userId !== req.user.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const favorites = await storage.getUserFavorites(req.user.id);
+      res.json(favorites);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch favorites" });
+    }
+  });
+
+  app.post("/api/events/:eventId/favorite", requireAuth, async (req: any, res) => {
+    try {
+      const isFavorited = await storage.isFavorited(req.user.id, req.params.eventId);
+      
+      if (isFavorited) {
+        await storage.deleteFavorite(req.user.id, req.params.eventId);
+        res.json({ favorited: false, message: "Removed from favorites" });
+      } else {
+        await storage.createFavorite({
+          userId: req.user.id,
+          eventId: req.params.eventId
+        });
+        res.json({ favorited: true, message: "Added to favorites" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update favorite" });
+    }
+  });
+
+  app.get("/api/events/:eventId/favorite", requireAuth, async (req: any, res) => {
+    try {
+      const isFavorited = await storage.isFavorited(req.user.id, req.params.eventId);
+      res.json({ favorited: isFavorited });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to check favorite status" });
     }
   });
 

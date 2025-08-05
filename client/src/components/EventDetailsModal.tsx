@@ -24,6 +24,11 @@ export function EventDetailsModal({ eventId, isOpen, onClose }: EventDetailsModa
     enabled: isOpen && !!eventId,
   });
 
+  const { data: announcements } = useQuery({
+    queryKey: [`/api/events/${eventId}/announcements`],
+    enabled: isOpen && !!eventId,
+  });
+
   const rsvpMutation = useMutation({
     mutationFn: async (status: string) => {
       return apiRequest("POST", `/api/events/${eventId}/rsvp`, {
@@ -227,6 +232,32 @@ export function EventDetailsModal({ eventId, isOpen, onClose }: EventDetailsModa
                   <Badge key={index} variant="secondary">
                     {tag}
                   </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Announcements */}
+          {announcements && announcements.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Announcements</h3>
+              <div className="space-y-3">
+                {announcements.map((announcement: any) => (
+                  <div key={announcement.id} className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border-l-4 border-blue-500">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-1">
+                          {announcement.subject}
+                        </h4>
+                        <p className="text-blue-800 dark:text-blue-200 text-sm">
+                          {announcement.message}
+                        </p>
+                      </div>
+                      <div className="text-xs text-blue-600 dark:text-blue-400 ml-4">
+                        {format(new Date(announcement.createdAt), "MMM dd, h:mm a")}
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
