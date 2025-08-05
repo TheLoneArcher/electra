@@ -26,9 +26,43 @@ export default function Navbar() {
   const [location] = useLocation();
   const { theme, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, signOut } = useAuth();
+  const { user, signOut, isAuthenticated, signInWithGoogle } = useAuth();
 
-  if (!user) return null; // Don't show navbar if not authenticated
+  // Show different navbar for authenticated vs non-authenticated users
+  if (!isAuthenticated) {
+    return (
+      <nav className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-lg sticky top-0 z-50 transition-all duration-300 border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <div className="flex-shrink-0 flex items-center">
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center mr-3">
+                  <Calendar className="h-6 w-6 text-white" />
+                </div>
+                <Link href="/">
+                  <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent cursor-pointer">
+                    EventHub
+                  </span>
+                </Link>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Button variant="ghost" size="icon" onClick={toggleTheme} className="hover:bg-gray-100 dark:hover:bg-gray-800">
+                {theme === "light" ? (
+                  <Moon className="h-5 w-5" />
+                ) : (
+                  <Sun className="h-5 w-5" />
+                )}
+              </Button>
+              <Button onClick={signInWithGoogle} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+                Sign In with Google
+              </Button>
+            </div>
+          </div>
+        </div>
+      </nav>
+    );
+  }
 
   return (
     <nav className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-lg sticky top-0 z-50 transition-all duration-300 border-b border-gray-200 dark:border-gray-700">

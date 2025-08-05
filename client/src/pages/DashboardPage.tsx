@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Calendar, CheckCircle, Crown, Users, ExternalLink, Clock } from "lucide-react";
+import { Calendar, CheckCircle, Crown, Users, ExternalLink, Clock, Music, Gamepad2, Coffee, Briefcase, Heart, GraduationCap, MapPin, Palette, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import Navbar from "@/components/Navbar";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("upcoming");
@@ -16,13 +17,13 @@ export default function DashboardPage() {
     enabled: !!user,
   });
 
-  const upcomingEvents = userRsvps?.filter((rsvp: any) => 
+  const upcomingEvents = Array.isArray(userRsvps) ? userRsvps.filter((rsvp: any) => 
     rsvp.event && new Date(rsvp.event.dateTime) > new Date() && rsvp.status === "attending"
-  ) || [];
+  ) : [];
 
-  const pastEvents = userRsvps?.filter((rsvp: any) => 
+  const pastEvents = Array.isArray(userRsvps) ? userRsvps.filter((rsvp: any) => 
     rsvp.event && new Date(rsvp.event.dateTime) < new Date() && rsvp.status === "attending"
-  ) || [];
+  ) : [];
 
   const stats = [
     {
@@ -63,8 +64,22 @@ export default function DashboardPage() {
   ];
 
   const getCategoryIcon = (category: any) => {
-    if (!category) return "fas fa-calendar";
-    return category.icon;
+    if (!category) return Calendar;
+    
+    const iconMap: Record<string, any> = {
+      music: Music,
+      technology: Briefcase,
+      art: Palette,
+      sports: Trophy,
+      food: Coffee,
+      education: GraduationCap,
+      networking: Users,
+      health: Heart,
+      gaming: Gamepad2,
+      travel: MapPin,
+    };
+    
+    return iconMap[category.name?.toLowerCase()] || Calendar;
   };
 
   const getCategoryColor = (category: any) => {
@@ -150,7 +165,10 @@ export default function DashboardPage() {
                     >
                       <div className="flex items-center space-x-4">
                         <div className={`${getCategoryColor(rsvp.event.category)} rounded-lg p-3`}>
-                          <i className={`${getCategoryIcon(rsvp.event.category)} text-white`}></i>
+                          {(() => {
+                            const IconComponent = getCategoryIcon(rsvp.event.category);
+                            return <IconComponent className="h-5 w-5 text-white" />;
+                          })()}
                         </div>
                         <div>
                           <h4 className="font-semibold text-gray-900 dark:text-white">
@@ -209,7 +227,10 @@ export default function DashboardPage() {
                     >
                       <div className="flex items-center space-x-4">
                         <div className={`${getCategoryColor(rsvp.event.category)} rounded-lg p-3`}>
-                          <i className={`${getCategoryIcon(rsvp.event.category)} text-white`}></i>
+                          {(() => {
+                            const IconComponent = getCategoryIcon(rsvp.event.category);
+                            return <IconComponent className="h-5 w-5 text-white" />;
+                          })()}
                         </div>
                         <div>
                           <h4 className="font-semibold text-gray-900 dark:text-white">

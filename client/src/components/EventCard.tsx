@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Heart, Clock, MapPin, Users, Calendar, Check } from "lucide-react";
+import { Heart, Clock, MapPin, Users, Calendar, Check, Music, Briefcase, Palette, Trophy, Coffee, GraduationCap, Gamepad2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -90,7 +90,7 @@ export function EventCard({ event }: EventCardProps) {
     rsvpMutation.mutate("attending");
   };
 
-  const isAttending = userRsvp?.status === "attending";
+  const isAttending = userRsvp && typeof userRsvp === 'object' && 'status' in userRsvp ? userRsvp.status === "attending" : false;
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -99,6 +99,25 @@ export function EventCard({ event }: EventCardProps) {
 
   const eventDate = new Date(event.dateTime);
   const categoryColor = event.category ? categoryColorMap[event.category.color] || "bg-gray-600" : "bg-gray-600";
+  
+  const getCategoryIcon = (category: any) => {
+    if (!category) return Calendar;
+    
+    const iconMap: Record<string, any> = {
+      music: Music,
+      technology: Briefcase,
+      art: Palette,
+      sports: Trophy,
+      food: Coffee,
+      education: GraduationCap,
+      networking: Users,
+      health: Heart,
+      gaming: Gamepad2,
+      travel: MapPin,
+    };
+    
+    return iconMap[category.name?.toLowerCase()] || Calendar;
+  };
 
   return (
     <>
@@ -116,8 +135,11 @@ export function EventCard({ event }: EventCardProps) {
         >
           {event.category && (
             <div className="absolute top-4 left-4">
-              <Badge className={`${categoryColor} text-white px-3 py-1 text-sm font-medium`}>
-                <i className={`${event.category.icon} mr-1`}></i>
+              <Badge className={`${categoryColor} text-white px-3 py-1 text-sm font-medium flex items-center`}>
+                {(() => {
+                  const IconComponent = getCategoryIcon(event.category);
+                  return <IconComponent className="h-4 w-4 mr-1" />;
+                })()}
                 {event.category.name}
               </Badge>
             </div>

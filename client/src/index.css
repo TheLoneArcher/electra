@@ -175,6 +175,99 @@
 
 @keyframes glow-text {
   0%, 100% { text-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+  50% { text-shadow: 0 0 30px rgba(59, 130, 246, 0.8), 0 0 40px rgba(139, 92, 246, 0.3); }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-glow-text {
+  animation: glow-text 3s ease-in-out infinite;
+}
+
+.animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease-in-out infinite;
+}
+
+.animate-float-1 {
+  animation: float-1 6s ease-in-out infinite;
+}
+
+.animate-float-2 {
+  animation: float-2 8s ease-in-out infinite;
+}
+
+.animate-float-3 {
+  animation: float-3 10s ease-in-out infinite;
+}
+
+.animate-float-4 {
+  animation: float-4 7s ease-in-out infinite;
+}
+
+.animate-float-5 {
+  animation: float-5 9s ease-in-out infinite;
+}
+
+.animate-circuit-flow {
+  stroke-dasharray: 5 5;
+  animation: circuit-flow 3s linear infinite;
+}
+
+.animate-circuit-flow-reverse {
+  stroke-dasharray: 5 5;
+  animation: circuit-flow-reverse 3s linear infinite;
+}
+
+/* Cursor Glow Effect */
+.cursor-glow {
+  position: relative;
+  cursor: none;
+}
+
+.cursor-glow::before {
+  content: '';
+  position: fixed;
+  top: var(--mouse-y, 50%);
+  left: var(--mouse-x, 50%);
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.05) 40%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 5;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.2s ease;
+  opacity: 0.6;
+}
+
+@media (hover: hover) {
+  .cursor-glow {
+    cursor: default;
+  }
+  
+  .cursor-glow::before {
+    opacity: 0.8;
+  }
+}
+
+/* Better button hover effects */
+.btn-glow {
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+}
+
+.btn-glow:hover {
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+  transform: translateY(-2px);
+}
+
+@keyframes glow-text {
+  0%, 100% { text-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
   50% { text-shadow: 0 0 40px rgba(59, 130, 246, 0.8), 0 0 60px rgba(139, 92, 246, 0.3); }
 }
 

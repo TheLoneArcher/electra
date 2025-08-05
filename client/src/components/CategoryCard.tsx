@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { Music, Briefcase, Palette, Trophy, Coffee, GraduationCap, Users, Heart, Gamepad2, MapPin, Calendar } from "lucide-react";
 
 interface CategoryCardProps {
   category: {
@@ -22,6 +23,27 @@ const categoryColorMap: Record<string, string> = {
 
 export function CategoryCard({ category, eventCount = 0, onClick }: CategoryCardProps) {
   const colorClasses = categoryColorMap[category.color] || categoryColorMap.blue;
+  
+  const getCategoryIcon = (category: any) => {
+    if (!category) return Calendar;
+    
+    const iconMap: Record<string, any> = {
+      music: Music,
+      technology: Briefcase,
+      art: Palette,
+      sports: Trophy,
+      food: Coffee,
+      education: GraduationCap,
+      networking: Users,
+      health: Heart,
+      gaming: Gamepad2,
+      travel: MapPin,
+    };
+    
+    return iconMap[category.name?.toLowerCase()] || Calendar;
+  };
+
+  const IconComponent = getCategoryIcon(category);
 
   return (
     <Card 
@@ -29,8 +51,8 @@ export function CategoryCard({ category, eventCount = 0, onClick }: CategoryCard
       onClick={onClick}
     >
       <CardContent className="p-0">
-        <div className={`category-icon ${colorClasses}`}>
-          <i className={`${category.icon} text-2xl`}></i>
+        <div className={`category-icon ${colorClasses} w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3`}>
+          <IconComponent className="h-6 w-6" />
         </div>
         <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
           {category.name}

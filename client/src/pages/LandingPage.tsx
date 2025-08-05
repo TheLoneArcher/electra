@@ -3,9 +3,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, Users, Star, ArrowRight, Music, Code, Palette, Trophy, GraduationCap, Utensils, Eye } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from "react";
 
 export default function LandingPage() {
   const { signInWithGoogle } = useAuth();
+  
+  // Add cursor tracking for glow effect
+  useEffect(() => {
+    const updateMousePosition = (e: MouseEvent) => {
+      const root = document.documentElement;
+      root.style.setProperty('--mouse-x', `${e.clientX}px`);
+      root.style.setProperty('--mouse-y', `${e.clientY}px`);
+    };
+
+    document.addEventListener('mousemove', updateMousePosition);
+    return () => document.removeEventListener('mousemove', updateMousePosition);
+  }, []);
   
   const handleSignIn = () => {
     signInWithGoogle();
@@ -49,7 +62,7 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 dark:bg-black relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden cursor-glow">
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Grid Pattern */}
@@ -97,19 +110,19 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
           <div className="text-center">
             <div className="mb-8">
-              <Badge className="mb-4 px-4 py-2 text-sm font-medium bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 border border-blue-500/30 backdrop-blur-sm">
-                ⚡ Real-time Event Management
+              <Badge className="mb-4 px-4 py-2 text-sm font-medium bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-200 dark:text-blue-300 border border-blue-500/30 backdrop-blur-sm">
+                ⚡ Powered by Modern Technology
               </Badge>
             </div>
             
-            <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-8 leading-tight">
-              <span className="inline-block animate-glow-text">Next-Gen</span>
-              <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-cyan-400 bg-clip-text text-transparent block animate-gradient-shift">
+            <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold text-gray-900 dark:text-white mb-8 leading-tight">
+              <span className="inline-block animate-glow-text text-gray-800 dark:text-gray-100">Next-Gen</span>
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 bg-clip-text text-transparent block animate-gradient-shift">
                 Event Platform
               </span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed font-medium">
               Experience the future of event management. Create, discover, and join events with cutting-edge technology and seamless user experience.
             </p>
             
