@@ -21,9 +21,7 @@ export function setupAuth(app: Express) {
   app.use(passport.session());
 
   // Google OAuth Strategy
-  const callbackURL = process.env.NODE_ENV === 'production' 
-    ? `https://${process.env.REPLIT_DOMAINS}/api/auth/google/callback`
-    : "/api/auth/google/callback";
+  const callbackURL = `https://${process.env.REPLIT_DOMAINS}/api/auth/google/callback`;
     
   passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID || '',

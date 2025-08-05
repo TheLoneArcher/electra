@@ -11,6 +11,7 @@ import DashboardPage from "@/pages/DashboardPage";
 import HostDashboard from "@/pages/HostDashboard";
 import PastEventsPage from "@/pages/PastEventsPage";
 import LandingPage from "@/pages/LandingPage";
+import BrowsePage from "@/pages/BrowsePage";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -26,13 +27,17 @@ function Router() {
   return (
     <Switch>
       {!isAuthenticated ? (
-        <Route path="/" component={LandingPage} />
+        <>
+          <Route path="/" component={LandingPage} />
+          <Route path="/browse" component={BrowsePage} />
+        </>
       ) : (
         <>
           <Route path="/" component={HomePage} />
           <Route path="/dashboard" component={DashboardPage} />
           <Route path="/host" component={HostDashboard} />
           <Route path="/past-events" component={PastEventsPage} />
+          <Route path="/browse" component={BrowsePage} />
         </>
       )}
       <Route component={NotFound} />
