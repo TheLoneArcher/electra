@@ -59,16 +59,21 @@ export function CreateEventModal({ isOpen, onClose }: CreateEventModalProps) {
   const createEventMutation = useMutation({
     mutationFn: async (data: CreateEventForm) => {
       const eventData = {
-        ...data,
-        hostId: "sample-user-1", // In real app, get from auth context
+        title: data.title,
+        description: data.description,
+        categoryId: data.categoryId,
+        location: data.location,
         dateTime: new Date(data.dateTime).toISOString(),
-        tags: data.tags ? data.tags.split(",").map(tag => tag.trim()) : [],
+        capacity: Number(data.capacity),
         price: data.isPaid ? data.price || "0.00" : "0.00",
+        isPaid: data.isPaid,
+        tags: data.tags ? data.tags.split(",").map(tag => tag.trim()) : [],
       };
       return apiRequest("POST", "/api/events", eventData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/events"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/my-hosted-events"] });
       toast({
         title: "Event Created",
         description: "Your event has been created successfully.",
@@ -128,7 +133,7 @@ export function CreateEventModal({ isOpen, onClose }: CreateEventModalProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {categories?.map((category: any) => (
+                        {Array.isArray(categories) && categories.map((category: any) => (
                           <SelectItem key={category.id} value={category.id}>
                             {category.name}
                           </SelectItem>

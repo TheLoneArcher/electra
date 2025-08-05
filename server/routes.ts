@@ -5,6 +5,8 @@ import { storage } from "./storage";
 import { setupAuth, requireAuth, getCurrentUser } from "./auth";
 import { insertEventSchema, insertRsvpSchema, insertEventReviewSchema } from "@shared/schema";
 import { z } from "zod";
+import { createCalendarEvent, getCalendarAuthUrl, exchangeCodeForTokens } from "./calendar";
+import { notificationManager } from "./notifications";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
@@ -152,7 +154,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertEventSchema.parse({
         ...req.body,
-        organizerId: req.user.id, // Set organizer to current user
+        hostId: req.user.id, // Set host to current user
       });
       const event = await storage.createEvent(validatedData);
       res.status(201).json(event);
@@ -215,6 +217,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           status,
         });
         const rsvp = await storage.createRsvp(validatedData);
+        
+        // Send notification to event host
+        if (status === 'attending') {
+          await notificationManager.notifyNewRSVP(req.params.eventId, req.user.name);
+        }
+        
         res.status(201).json(rsvp);
       }
     } catch (error) {
@@ -270,6 +278,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Current user's hosted events
+  app.get("/api/my-hosted-events", requireAuth, async (req: any, res) => {
+    try {
+      const events = await storage.getEvents({ hostId: req.user.id });
+      
+      // Enrich events with category info and RSVP counts
+      const enrichedEvents = await Promise.all(
+        events.map(async (event) => {
+          const category = await storage.getEventCategory(event.categoryId);
+          const rsvps = await storage.getRsvpsByEvent(event.id);
+          const attendingCount = rsvps.filter(rsvp => rsvp.status === "attending").length;
+          
+          return {
+            ...event,
+            category,
+            attendingCount,
+          };
+        })
+      );
+      
+      res.json(enrichedEvents);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch hosted events" });
+    }
+  });
+
   // User RSVPs (legacy)
   app.get("/api/users/:userId/rsvps", async (req, res) => {
     try {
@@ -307,6 +341,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid review data", errors: error.errors });
       }
       res.status(500).json({ message: "Failed to create review" });
+    }
+  });
+
+  // Notifications
+  app.get("/api/notifications", requireAuth, async (req: any, res) => {
+    try {
+      const notifications = await notificationManager.getUserNotifications(req.user.id);
+      res.json(notifications);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch notifications" });
+    }
+  });
+
+  app.post("/api/notifications/:id/read", requireAuth, async (req: any, res) => {
+    try {
+      const success = await notificationManager.markAsRead(req.user.id, req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: "Notification not found" });
+      }
+      res.json({ message: "Notification marked as read" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to mark notification as read" });
+    }
+  });
+
+  app.post("/api/notifications/read-all", requireAuth, async (req: any, res) => {
+    try {
+      await notificationManager.markAllAsRead(req.user.id);
+      res.json({ message: "All notifications marked as read" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to mark all notifications as read" });
+    }
+  });
+
+  app.delete("/api/notifications/:id", requireAuth, async (req: any, res) => {
+    try {
+      const success = await notificationManager.deleteNotification(req.user.id, req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: "Notification not found" });
+      }
+      res.json({ message: "Notification deleted" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete notification" });
+    }
+  });
+
+  // Calendar integration
+  app.get("/api/calendar/auth-url", requireAuth, async (req: any, res) => {
+    try {
+      const authUrl = await getCalendarAuthUrl(req.user.id);
+      res.json({ authUrl });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to generate calendar auth URL" });
+    }
+  });
+
+  app.get("/api/calendar/callback", async (req, res) => {
+    try {
+      const { code, state: userId } = req.query;
+      
+      if (!code || !userId) {
+        return res.status(400).json({ message: "Missing authorization code or user ID" });
+      }
+
+      const tokens = await exchangeCodeForTokens(code as string);
+      
+      // Store tokens in user session or database (simplified for demo)
+      // In production, you'd store this securely
+      req.session.calendarTokens = tokens;
+      
+      res.redirect('/?calendar-connected=true');
+    } catch (error) {
+      console.error('Calendar callback error:', error);
+      res.redirect('/?calendar-error=true');
+    }
+  });
+
+  app.post("/api/events/:eventId/sync-calendar", requireAuth, async (req: any, res) => {
+    try {
+      const event = await storage.getEvent(req.params.eventId);
+      if (!event) {
+        return res.status(404).json({ message: "Event not found" });
+      }
+
+      // Check if user has calendar tokens
+      const tokens = req.session.calendarTokens;
+      if (!tokens || !tokens.access_token) {
+        return res.status(400).json({ message: "Calendar not connected. Please authorize Google Calendar access first." });
+      }
+
+      try {
+        await createCalendarEvent(tokens.access_token, event);
+        await notificationManager.notifyCalendarSync(req.user.id, true, event.title);
+        res.json({ message: "Event synced to Google Calendar successfully" });
+      } catch (calendarError) {
+        await notificationManager.notifyCalendarSync(req.user.id, false, event.title);
+        throw calendarError;
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Failed to sync event to calendar" });
     }
   });
 

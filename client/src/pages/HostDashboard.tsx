@@ -5,6 +5,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Megaphone, Camera, TrendingUp, Users, DollarSign } from "lucide-react";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
 import { CreateEventModal } from "@/components/CreateEventModal";
 
@@ -59,6 +61,15 @@ export default function HostDashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [timeRange, setTimeRange] = useState("30");
 
+  const { user } = useAuth();
+  const { data: hostedEvents = [] } = useQuery({
+    queryKey: ["/api/my-hosted-events"],
+    enabled: !!user,
+  });
+
+  const totalAttendees = Array.isArray(hostedEvents) ? hostedEvents.reduce((total: number, event: any) => total + (event.attendingCount || 0), 0) : 0;
+  const totalRevenue = Array.isArray(hostedEvents) ? hostedEvents.reduce((total: number, event: any) => total + (parseFloat(event.price || "0") * (event.attendingCount || 0)), 0) : 0;
+
   const metrics = [
     {
       title: "Attendance Rate",
@@ -76,7 +87,7 @@ export default function HostDashboard() {
     },
     {
       title: "Revenue",
-      value: "$2,450",
+      value: `$${totalRevenue.toFixed(2)}`,
       icon: DollarSign,
       color: "text-yellow-600 dark:text-yellow-400",
       bgColor: "bg-yellow-100 dark:bg-yellow-900",

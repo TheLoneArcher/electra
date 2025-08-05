@@ -17,6 +17,11 @@ export default function DashboardPage() {
     enabled: !!user,
   });
 
+  const { data: hostedEvents = [] } = useQuery({
+    queryKey: ["/api/my-hosted-events"],
+    enabled: !!user,
+  });
+
   const upcomingEvents = Array.isArray(userRsvps) ? userRsvps.filter((rsvp: any) => 
     rsvp.event && new Date(rsvp.event.dateTime) > new Date() && rsvp.status === "attending"
   ) : [];
@@ -42,14 +47,14 @@ export default function DashboardPage() {
     },
     {
       title: "Events Hosted",
-      value: 5,
+      value: Array.isArray(hostedEvents) ? hostedEvents.length : 0,
       icon: Crown,
       color: "text-purple-600 dark:text-purple-400",
       bgColor: "bg-purple-100 dark:bg-purple-900",
     },
     {
       title: "Total Attendees",
-      value: 342,
+      value: Array.isArray(hostedEvents) ? hostedEvents.reduce((total: number, event: any) => total + (event.attendingCount || 0), 0) : 0,
       icon: Users,
       color: "text-yellow-600 dark:text-yellow-400",
       bgColor: "bg-yellow-100 dark:bg-yellow-900",
@@ -268,14 +273,57 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8">
-                <p className="text-gray-500 dark:text-gray-400 mb-4">
-                  You haven't created any events yet.
-                </p>
-                <Button className="bg-primary hover:bg-primary/90">
-                  Create Your First Event
-                </Button>
-              </div>
+              {Array.isArray(hostedEvents) && hostedEvents.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500 dark:text-gray-400 mb-4">
+                    You haven't created any events yet.
+                  </p>
+                  <Button className="bg-primary hover:bg-primary/90">
+                    Create Your First Event
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {Array.isArray(hostedEvents) && hostedEvents.map((event: any) => (
+                    <div 
+                      key={event.id} 
+                      className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
+                    >
+                      <div className="flex items-center space-x-4">
+                        <div className={`${getCategoryColor(event.category)} rounded-lg p-3`}>
+                          {(() => {
+                            const IconComponent = getCategoryIcon(event.category);
+                            return <IconComponent className="h-5 w-5 text-white" />;
+                          })()}
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-gray-900 dark:text-white">
+                            {event.title}
+                          </h4>
+                          <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 space-x-4">
+                            <span className="flex items-center">
+                              <Clock className="h-4 w-4 mr-1" />
+                              {format(new Date(event.dateTime), "MMM dd, yyyy • h:mm a")}
+                            </span>
+                            <span className="flex items-center">
+                              <Users className="h-4 w-4 mr-1" />
+                              {event.attendingCount || 0}/{event.capacity} attending
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Button variant="outline" size="sm">
+                          Manage Event
+                        </Button>
+                        <Button variant="ghost" size="icon" title="View Details">
+                          <ExternalLink className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         )}

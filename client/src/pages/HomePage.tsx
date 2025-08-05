@@ -38,6 +38,18 @@ export default function HomePage() {
     setSelectedCategory(categoryId === selectedCategory ? "" : categoryId);
   };
 
+  const handleCalendarSync = async () => {
+    try {
+      const response = await fetch('/api/calendar/auth-url');
+      const data = await response.json();
+      if (data.authUrl) {
+        window.open(data.authUrl, '_blank');
+      }
+    } catch (error) {
+      console.error('Failed to get calendar auth URL:', error);
+    }
+  };
+
   const heroStyle = {
     backgroundImage: `linear-gradient(rgba(99, 102, 241, 0.7), rgba(139, 92, 246, 0.7)), url('https://images.unsplash.com/photo-1459749411175-04bf5292ceea?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=600')`,
   };
@@ -101,12 +113,11 @@ export default function HomePage() {
               <Plus className="h-5 w-5" />
               <span>Create Event</span>
             </Button>
-            <Button variant="outline" className="flex items-center space-x-2 px-6 py-3 font-semibold">
-              <i className="fab fa-google"></i>
-              <span>Sign in with Google</span>
-            </Button>
-            <Button className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 font-semibold">
-              <i className="fab fa-google-drive"></i>
+            <Button 
+              onClick={handleCalendarSync}
+              className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 font-semibold"
+            >
+              <Calendar className="h-5 w-5" />
               <span>Sync Calendar</span>
             </Button>
           </div>
@@ -120,7 +131,7 @@ export default function HomePage() {
             Browse by Category
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-            {categories?.map((category: any) => (
+            {Array.isArray(categories) && categories.map((category: any) => (
               <CategoryCard
                 key={category.id}
                 category={category}
@@ -148,7 +159,7 @@ export default function HomePage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Categories</SelectItem>
-                  {categories?.map((category: any) => (
+                  {Array.isArray(categories) && categories.map((category: any) => (
                     <SelectItem key={category.id} value={category.id}>
                       {category.name}
                     </SelectItem>
