@@ -1,8 +1,13 @@
 import { useState } from "react";
-import { Calendar, CheckCircle, Crown, Users, ExternalLink, Clock, Music, Gamepad2, Coffee, Briefcase, Heart, GraduationCap, MapPin, Palette, Trophy } from "lucide-react";
+import { Calendar, CheckCircle, Crown, Users, ExternalLink, Clock, Music, Gamepad2, Coffee, Briefcase, Heart, GraduationCap, MapPin, Palette, Trophy, Plus, MoreHorizontal, Edit, Megaphone, Trash2, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { format } from "date-fns";
 import Navbar from "@/components/Navbar";
@@ -74,7 +79,7 @@ export default function DashboardPage() {
   const tabButtons = [
     { id: "upcoming", label: "Upcoming" },
     { id: "past", label: "Past Events" },
-    { id: "hosting", label: "Hosting" },
+    { id: "hosting", label: "Host Dashboard" },
     { id: "favorites", label: "Favorites" },
   ];
 
@@ -141,6 +146,113 @@ export default function DashboardPage() {
 
   const handleCalendarSync = (eventId: string) => {
     calendarSyncMutation.mutate(eventId);
+  };
+
+  // Event management handlers
+  const handleEditEvent = (eventId: string) => {
+    // Navigate to edit event page or open edit modal
+    toast({
+      title: "Edit Event",
+      description: "Edit functionality coming soon!",
+    });
+  };
+
+  const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
+  const [selectedEventForAnnouncement, setSelectedEventForAnnouncement] = useState<string | null>(null);
+  const [announcementSubject, setAnnouncementSubject] = useState("");
+  const [announcementMessage, setAnnouncementMessage] = useState("");
+
+  const announcementMutation = useMutation({
+    mutationFn: (data: { eventId: string; subject: string; message: string }) =>
+      apiRequest("POST", `/api/events/${data.eventId}/announcements`, {
+        subject: data.subject,
+        message: data.message,
+      }),
+    onSuccess: (data) => {
+      toast({
+        title: "Announcement Sent",
+        description: `Announcement sent to ${data.recipientCount} attendees`,
+      });
+      setShowAnnouncementModal(false);
+      setAnnouncementSubject("");
+      setAnnouncementMessage("");
+    },
+    onError: () => {
+      toast({
+        title: "Failed to Send",
+        description: "Failed to send announcement. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSendAnnouncement = (eventId: string) => {
+    setSelectedEventForAnnouncement(eventId);
+    setShowAnnouncementModal(true);
+  };
+
+  const submitAnnouncement = () => {
+    if (!selectedEventForAnnouncement || !announcementSubject.trim() || !announcementMessage.trim()) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in both subject and message.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    announcementMutation.mutate({
+      eventId: selectedEventForAnnouncement,
+      subject: announcementSubject,
+      message: announcementMessage,
+    });
+  };
+
+  const deleteEventMutation = useMutation({
+    mutationFn: (eventId: string) => apiRequest("DELETE", `/api/events/${eventId}`),
+    onSuccess: () => {
+      toast({
+        title: "Event Deleted",
+        description: "Your event has been deleted successfully.",
+      });
+      // Refresh the hosted events list
+      window.location.reload();
+    },
+    onError: () => {
+      toast({
+        title: "Delete Failed",
+        description: "Failed to delete event. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDeleteEvent = (eventId: string) => {
+    if (confirm("Are you sure you want to delete this event? This action cannot be undone.")) {
+      deleteEventMutation.mutate(eventId);
+    }
+  };
+
+  // Favorites handler
+  const favoriteMutation = useMutation({
+    mutationFn: (eventId: string) => apiRequest("POST", `/api/events/${eventId}/favorite`, {}),
+    onSuccess: (data) => {
+      toast({
+        title: data.favorited ? "Added to Favorites" : "Removed from Favorites",
+        description: data.message,
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update favorite. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleFavoriteToggle = (eventId: string) => {
+    favoriteMutation.mutate(eventId);
   };
 
   return (
@@ -310,9 +422,17 @@ export default function DashboardPage() {
                         <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
                           Attended
                         </Badge>
-                        <div className="mt-2">
+                        <div className="mt-2 flex space-x-2">
                           <Button variant="outline" size="sm">
                             Rate & Review
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => handleFavoriteToggle(rsvp.event.id)}
+                            title="Add to Favorites"
+                          >
+                            <Heart className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>
@@ -324,79 +444,129 @@ export default function DashboardPage() {
           </Card>
         )}
 
-        {/* Hosting Tab */}
+        {/* Host Dashboard */}
         {activeTab === "hosting" && (
-          <Card className="bg-white dark:bg-gray-800">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">
-                Created Events (Newest First)
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {Array.isArray(hostedEvents) && hostedEvents.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-gray-500 dark:text-gray-400 mb-4">
-                    You haven't created any events yet.
-                  </p>
-                  <Button className="bg-primary hover:bg-primary/90">
-                    Create Your First Event
+          <div className="space-y-6">
+            {/* Created Events Section */}
+            <Card className="bg-white dark:bg-gray-800">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">
+                    My Created Events ({Array.isArray(hostedEvents) ? hostedEvents.length : 0})
+                  </CardTitle>
+                  <Button 
+                    className="bg-primary hover:bg-primary/90"
+                    onClick={() => window.location.href = '/create'}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create Event
                   </Button>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  {Array.isArray(hostedEvents) && hostedEvents.map((event: any) => (
-                    <div 
-                      key={event.id} 
-                      className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
+              </CardHeader>
+              <CardContent>
+                {Array.isArray(hostedEvents) && hostedEvents.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500 dark:text-gray-400 mb-4">
+                      You haven't created any events yet.
+                    </p>
+                    <Button 
+                      className="bg-primary hover:bg-primary/90"
+                      onClick={() => window.location.href = '/create'}
                     >
-                      <div className="flex items-center space-x-4">
-                        <div className={`${getCategoryColor(event.category)} rounded-lg p-3`}>
-                          {(() => {
-                            const IconComponent = getCategoryIcon(event.category);
-                            return <IconComponent className="h-5 w-5 text-white" />;
-                          })()}
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-gray-900 dark:text-white">
-                            {event.title}
-                          </h4>
-                          <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 space-x-4">
-                            <span className="flex items-center">
-                              <Clock className="h-4 w-4 mr-1" />
-                              {format(new Date(event.dateTime), "MMM dd, yyyy • h:mm a")}
-                            </span>
-                            <span className="flex items-center">
-                              <Users className="h-4 w-4 mr-1" />
-                              {event.attendingCount || 0}/{event.capacity} attending
-                            </span>
+                      Create Your First Event
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {Array.isArray(hostedEvents) && hostedEvents.map((event: any) => (
+                      <div 
+                        key={event.id} 
+                        className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-start space-x-4 flex-1">
+                            <div className={`${getCategoryColor(event.category)} rounded-lg p-3`}>
+                              {(() => {
+                                const IconComponent = getCategoryIcon(event.category);
+                                return <IconComponent className="h-5 w-5 text-white" />;
+                              })()}
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-gray-900 dark:text-white text-lg mb-2">
+                                {event.title}
+                              </h4>
+                              <p className="text-gray-600 dark:text-gray-300 text-sm mb-3">
+                                {event.description}
+                              </p>
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-500 dark:text-gray-400">
+                                <span className="flex items-center">
+                                  <Clock className="h-4 w-4 mr-1" />
+                                  {format(new Date(event.dateTime), "MMM dd, yyyy")}
+                                </span>
+                                <span className="flex items-center">
+                                  <MapPin className="h-4 w-4 mr-1" />
+                                  {event.location}
+                                </span>
+                                <span className="flex items-center">
+                                  <Users className="h-4 w-4 mr-1" />
+                                  {event.attendingCount || 0}/{event.capacity} attending
+                                </span>
+                                <span className="flex items-center">
+                                  <DollarSign className="h-4 w-4 mr-1" />
+                                  {event.isPaid ? `$${event.price}` : "Free"}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex flex-col space-y-2 ml-4">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => setSelectedEventId(event.id)}
+                              data-testid={`button-view-details-${event.id}`}
+                            >
+                              <ExternalLink className="h-4 w-4 mr-1" />
+                              View Details
+                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="w-full">
+                                  <MoreHorizontal className="h-4 w-4 mr-1" />
+                                  Manage
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => handleEditEvent(event.id)}>
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Edit Event
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleSendAnnouncement(event.id)}>
+                                  <Megaphone className="h-4 w-4 mr-2" />
+                                  Send Announcement
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleCalendarSync(event.id)}>
+                                  <Calendar className="h-4 w-4 mr-2" />
+                                  Add to Calendar
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem 
+                                  onClick={() => handleDeleteEvent(event.id)}
+                                  className="text-red-600 dark:text-red-400"
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete Event
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => setSelectedEventId(event.id)}
-                          data-testid={`button-manage-event-${event.id}`}
-                        >
-                          Manage Event
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          title="View Details"
-                          onClick={() => setSelectedEventId(event.id)}
-                          data-testid={`button-view-hosted-event-${event.id}`}
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         )}
 
         {/* Favorites Tab */}
@@ -476,6 +646,50 @@ export default function DashboardPage() {
           onClose={() => setSelectedEventId(null)}
         />
       )}
+
+      {/* Announcement Modal */}
+      <Dialog open={showAnnouncementModal} onOpenChange={setShowAnnouncementModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Send Announcement</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="subject">Subject</Label>
+              <Input
+                id="subject"
+                value={announcementSubject}
+                onChange={(e) => setAnnouncementSubject(e.target.value)}
+                placeholder="Enter announcement subject..."
+              />
+            </div>
+            <div>
+              <Label htmlFor="message">Message</Label>
+              <Textarea
+                id="message"
+                value={announcementMessage}
+                onChange={(e) => setAnnouncementMessage(e.target.value)}
+                placeholder="Enter announcement message..."
+                rows={4}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowAnnouncementModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={submitAnnouncement}
+              disabled={announcementMutation.isPending}
+            >
+              {announcementMutation.isPending ? "Sending..." : "Send Announcement"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
