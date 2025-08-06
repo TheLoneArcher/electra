@@ -1,0 +1,949 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventHub - Event Organizing Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366F1',
+                        secondary: '#10B981',
+                        accent: '#F59E0B',
+                        danger: '#EF4444'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 font-sans transition-colors duration-300">
+
+    <!-- Navigation -->
+    <nav class="bg-white dark:bg-gray-800 shadow-lg sticky top-0 z-50 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-calendar-alt text-2xl text-primary mr-2"></i>
+                        <span class="text-xl font-bold text-gray-900 dark:text-white">EventHub</span>
+                    </div>
+                    <div class="hidden md:ml-10 md:flex md:space-x-8">
+                        <a href="#" class="text-primary border-b-2 border-primary px-1 pt-1 pb-4 text-sm font-medium">Browse Events</a>
+                        <a href="#" class="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white px-1 pt-1 pb-4 text-sm font-medium">My Events</a>
+                        <a href="#" class="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white px-1 pt-1 pb-4 text-sm font-medium">Host Dashboard</a>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <!-- Notifications -->
+                    <button class="relative p-2 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white">
+                        <i class="fas fa-bell text-lg"></i>
+                        <span class="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+                    </button>
+                    
+                    <!-- Dark mode toggle -->
+                    <button class="p-2 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white">
+                        <i class="fas fa-moon dark:hidden text-lg"></i>
+                        <i class="fas fa-sun hidden dark:block text-lg"></i>
+                    </button>
+                    
+                    <!-- User profile -->
+                    <div class="flex items-center space-x-2">
+                        <!-- A professional headshot photo of a person in business attire -->
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100" alt="Profile" class="h-8 w-8 rounded-full">
+                        <span class="hidden md:block text-sm font-medium text-gray-900 dark:text-white">John Doe</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative">
+        <!-- A vibrant scene of people attending an outdoor music festival with colorful lights -->
+        <div class="h-96 bg-cover bg-center relative" style="background-image: linear-gradient(rgba(99, 102, 241, 0.7), rgba(139, 92, 246, 0.7)), url('https://images.unsplash.com/photo-1459749411175-04bf5292ceea?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=600');">
+            <div class="absolute inset-0 flex items-center justify-center">
+                <div class="text-center text-white max-w-4xl mx-auto px-4">
+                    <h1 class="text-5xl md:text-6xl font-bold mb-6">Discover Amazing Events</h1>
+                    <p class="text-xl md:text-2xl mb-8 opacity-90">Create, discover, and participate in local events and community gatherings</p>
+                    
+                    <!-- Search Bar -->
+                    <div class="flex flex-col md:flex-row gap-4 max-w-2xl mx-auto">
+                        <div class="flex-1 relative">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" placeholder="Search events..." class="w-full pl-10 pr-4 py-3 rounded-lg border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-primary focus:outline-none">
+                        </div>
+                        <div class="relative">
+                            <i class="fas fa-map-marker-alt absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" placeholder="Location" class="w-full md:w-48 pl-10 pr-4 py-3 rounded-lg border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-primary focus:outline-none">
+                        </div>
+                        <button class="bg-accent hover:bg-yellow-500 text-white px-8 py-3 rounded-lg font-semibold transition-colors duration-200">
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="py-8 bg-white dark:bg-gray-800 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap justify-center gap-4">
+                <button class="flex items-center space-x-2 bg-primary hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200">
+                    <i class="fas fa-plus"></i>
+                    <span>Create Event</span>
+                </button>
+                <button class="flex items-center space-x-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200">
+                    <i class="fab fa-google"></i>
+                    <span>Sign in with Google</span>
+                </button>
+                <button class="flex items-center space-x-2 bg-secondary hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200">
+                    <i class="fab fa-google-drive"></i>
+                    <span>Sync Calendar</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Event Categories -->
+    <section class="py-12 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white text-center mb-8">Browse by Category</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                <!-- @COMPONENT: CategoryCard [title, icon, color, count] -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group">
+                    <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-music text-2xl text-blue-600 dark:text-blue-400"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Music</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">42 events</p>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group">
+                    <div class="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-laptop-code text-2xl text-green-600 dark:text-green-400"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Tech</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">28 events</p>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group">
+                    <div class="w-16 h-16 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-palette text-2xl text-purple-600 dark:text-purple-400"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Art</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">35 events</p>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group">
+                    <div class="w-16 h-16 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-running text-2xl text-red-600 dark:text-red-400"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Sports</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">19 events</p>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group">
+                    <div class="w-16 h-16 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-utensils text-2xl text-yellow-600 dark:text-yellow-400"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Food</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">31 events</p>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group">
+                    <div class="w-16 h-16 bg-indigo-100 dark:bg-indigo-900 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-graduation-cap text-2xl text-indigo-600 dark:text-indigo-400"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Education</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">24 events</p>
+                </div>
+                <!-- @END_COMPONENT: CategoryCard -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Upcoming Events -->
+    <section class="py-12 bg-white dark:bg-gray-800 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4 md:mb-0">Upcoming Events</h2>
+                
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-2">
+                    <select class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:outline-none">
+                        <option>All Categories</option>
+                        <option>Music</option>
+                        <option>Tech</option>
+                        <option>Art</option>
+                    </select>
+                    <select class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:outline-none">
+                        <option>All Types</option>
+                        <option>Free</option>
+                        <option>Paid</option>
+                    </select>
+                    <button class="px-4 py-2 bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white rounded-lg hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors duration-200">
+                        <i class="fas fa-filter mr-2"></i>More Filters
+                    </button>
+                </div>
+            </div>
+
+            <!-- Event Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- @MAP: events.map(event => ( -->
+                <!-- @COMPONENT: EventCard [event data] -->
+                <div class="bg-white dark:bg-gray-700 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer">
+                    <!-- A vibrant tech conference with speakers on stage and audience with laptops -->
+                    <div class="relative h-48 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400');">
+                        <div class="absolute top-4 left-4">
+                            <span class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+                                <i class="fas fa-laptop-code mr-1"></i>Tech
+                            </span>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <button class="bg-white bg-opacity-90 rounded-full p-2 hover:bg-opacity-100 transition-all duration-200">
+                                <i class="far fa-heart text-gray-600 hover:text-red-500"></i>
+                            </button>
+                        </div>
+                        <div class="absolute bottom-4 left-4 bg-white bg-opacity-90 rounded-lg px-3 py-2">
+                            <div class="text-center">
+                                <div class="text-lg font-bold text-gray-900">15</div>
+                                <div class="text-xs text-gray-600">DEC</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-primary transition-colors duration-200">
+                            Web Development Bootcamp 2024
+                        </h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
+                            Join us for an intensive 3-day bootcamp covering modern web development technologies including React, Node.js, and cloud deployment.
+                        </p>
+                        
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
+                            <i class="fas fa-clock mr-2"></i>
+                            <span>Dec 15, 2024 • 9:00 AM</span>
+                        </div>
+                        
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span>Tech Hub, Downtown Campus</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="flex -space-x-2">
+                                    <!-- A diverse group of professional headshots showing event attendees -->
+                                    <img src="https://pixabay.com/get/gaf6247d0f3db1c8890f0a9b69ca6b37327a49beac375dfda3b66bbdc3b4eb7e15e5b9da01d3ede6a3f96a915183d5ac4b40b251e64e6a5e1dc57e6f74dc42e1b_1280.jpg" alt="Attendee" class="h-8 w-8 rounded-full border-2 border-white">
+                                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100" alt="Attendee" class="h-8 w-8 rounded-full border-2 border-white">
+                                    <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100" alt="Attendee" class="h-8 w-8 rounded-full border-2 border-white">
+                                </div>
+                                <span class="ml-2 text-sm text-gray-500 dark:text-gray-400">+45 going</span>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-bold text-primary">$49</div>
+                                <button class="mt-2 bg-primary hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+                                    RSVP
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Card 2 -->
+                <div class="bg-white dark:bg-gray-700 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer">
+                    <!-- A modern art gallery with colorful paintings and visitors viewing artwork -->
+                    <div class="relative h-48 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400');">
+                        <div class="absolute top-4 left-4">
+                            <span class="bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+                                <i class="fas fa-palette mr-1"></i>Art
+                            </span>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <button class="bg-white bg-opacity-90 rounded-full p-2 hover:bg-opacity-100 transition-all duration-200">
+                                <i class="fas fa-heart text-red-500"></i>
+                            </button>
+                        </div>
+                        <div class="absolute bottom-4 left-4 bg-white bg-opacity-90 rounded-lg px-3 py-2">
+                            <div class="text-center">
+                                <div class="text-lg font-bold text-gray-900">18</div>
+                                <div class="text-xs text-gray-600">DEC</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-primary transition-colors duration-200">
+                            Contemporary Art Exhibition
+                        </h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
+                            Explore the latest works from emerging local artists in this curated exhibition featuring contemporary paintings and digital art.
+                        </p>
+                        
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
+                            <i class="fas fa-clock mr-2"></i>
+                            <span>Dec 18, 2024 • 6:00 PM</span>
+                        </div>
+                        
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span>City Art Gallery, Arts District</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="flex -space-x-2">
+                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100" alt="Attendee" class="h-8 w-8 rounded-full border-2 border-white">
+                                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100" alt="Attendee" class="h-8 w-8 rounded-full border-2 border-white">
+                                </div>
+                                <span class="ml-2 text-sm text-gray-500 dark:text-gray-400">+23 going</span>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-bold text-secondary">Free</div>
+                                <button class="mt-2 bg-primary hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+                                    RSVP
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Card 3 -->
+                <div class="bg-white dark:bg-gray-700 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer">
+                    <!-- A live music concert with band performing on stage and energetic crowd -->
+                    <div class="relative h-48 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400');">
+                        <div class="absolute top-4 left-4">
+                            <span class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+                                <i class="fas fa-music mr-1"></i>Music
+                            </span>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <button class="bg-white bg-opacity-90 rounded-full p-2 hover:bg-opacity-100 transition-all duration-200">
+                                <i class="far fa-heart text-gray-600 hover:text-red-500"></i>
+                            </button>
+                        </div>
+                        <div class="absolute bottom-4 left-4 bg-white bg-opacity-90 rounded-lg px-3 py-2">
+                            <div class="text-center">
+                                <div class="text-lg font-bold text-gray-900">22</div>
+                                <div class="text-xs text-gray-600">DEC</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-primary transition-colors duration-200">
+                            Indie Music Festival 2024
+                        </h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
+                            A night of amazing indie music featuring local bands and special guest performers. Food trucks and craft beverages available.
+                        </p>
+                        
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
+                            <i class="fas fa-clock mr-2"></i>
+                            <span>Dec 22, 2024 • 7:00 PM</span>
+                        </div>
+                        
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span>Riverside Park Amphitheater</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="flex -space-x-2">
+                                    <img src="https://images.unsplash.com/photo-1504593811423-6dd665756598?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100" alt="Attendee" class="h-8 w-8 rounded-full border-2 border-white">
+                                    <img src="https://images.unsplash.com/photo-1507591064344-4c6ce005b128?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100" alt="Attendee" class="h-8 w-8 rounded-full border-2 border-white">
+                                    <img src="https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100" alt="Attendee" class="h-8 w-8 rounded-full border-2 border-white">
+                                </div>
+                                <span class="ml-2 text-sm text-gray-500 dark:text-gray-400">+127 going</span>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-bold text-primary">$25</div>
+                                <button class="mt-2 bg-primary hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+                                    RSVP
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: EventCard -->
+                <!-- @END_MAP )) -->
+            </div>
+
+            <!-- Load More Button -->
+            <div class="text-center mt-12">
+                <button class="bg-white dark:bg-gray-700 border-2 border-primary text-primary hover:bg-primary hover:text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200">
+                    Load More Events
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Section (My Events) -->
+    <section class="py-12 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white text-center mb-8">My Events Dashboard</h2>
+            
+            <!-- Dashboard Navigation -->
+            <div class="flex flex-wrap justify-center gap-4 mb-8">
+                <button class="bg-primary text-white px-6 py-3 rounded-lg font-semibold">Upcoming</button>
+                <button class="bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-semibold border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200">Past Events</button>
+                <button class="bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-semibold border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200">Hosting</button>
+                <button class="bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-semibold border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200">Favorites</button>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Upcoming Events</p>
+                            <p class="text-2xl font-bold text-gray-900 dark:text-white">8</p>
+                        </div>
+                        <div class="bg-blue-100 dark:bg-blue-900 rounded-full p-3">
+                            <i class="fas fa-calendar-alt text-blue-600 dark:text-blue-400"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Past Events</p>
+                            <p class="text-2xl font-bold text-gray-900 dark:text-white">24</p>
+                        </div>
+                        <div class="bg-green-100 dark:bg-green-900 rounded-full p-3">
+                            <i class="fas fa-check-circle text-green-600 dark:text-green-400"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Events Hosted</p>
+                            <p class="text-2xl font-bold text-gray-900 dark:text-white">5</p>
+                        </div>
+                        <div class="bg-purple-100 dark:bg-purple-900 rounded-full p-3">
+                            <i class="fas fa-crown text-purple-600 dark:text-purple-400"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Total Attendees</p>
+                            <p class="text-2xl font-bold text-gray-900 dark:text-white">342</p>
+                        </div>
+                        <div class="bg-yellow-100 dark:bg-yellow-900 rounded-full p-3">
+                            <i class="fas fa-users text-yellow-600 dark:text-yellow-400"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Upcoming Events -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">My Upcoming Events</h3>
+                <div class="space-y-4">
+                    <!-- @MAP: myEvents.map(event => ( -->
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <div class="flex items-center space-x-4">
+                            <div class="bg-primary rounded-lg p-3">
+                                <i class="fas fa-laptop-code text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 dark:text-white">Web Development Bootcamp</h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Dec 15, 2024 • 9:00 AM</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button class="text-primary hover:text-indigo-700 p-2" title="Add to Calendar">
+                                <i class="fab fa-google"></i>
+                            </button>
+                            <button class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 p-2" title="View Details">
+                                <i class="fas fa-external-link-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <div class="flex items-center space-x-4">
+                            <div class="bg-purple-600 rounded-lg p-3">
+                                <i class="fas fa-palette text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 dark:text-white">Contemporary Art Exhibition</h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Dec 18, 2024 • 6:00 PM</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button class="text-primary hover:text-indigo-700 p-2" title="Add to Calendar">
+                                <i class="fab fa-google"></i>
+                            </button>
+                            <button class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 p-2" title="View Details">
+                                <i class="fas fa-external-link-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- @END_MAP )) -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Host Dashboard Section -->
+    <section class="py-12 bg-white dark:bg-gray-800 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white text-center mb-8">Host Dashboard</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Event Analytics -->
+                <div class="lg:col-span-2">
+                    <div class="bg-gray-50 dark:bg-gray-900 rounded-xl p-6">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Event Analytics</h3>
+                        
+                        <!-- Chart Placeholder -->
+                        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 mb-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="font-semibold text-gray-900 dark:text-white">RSVP Trends</h4>
+                                <select class="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <option>Last 30 days</option>
+                                    <option>Last 90 days</option>
+                                </select>
+                            </div>
+                            <!-- Chart visualization would go here -->
+                            <div class="h-64 bg-gradient-to-br from-primary/10 to-purple-600/10 rounded-lg flex items-center justify-center">
+                                <div class="text-center">
+                                    <i class="fas fa-chart-line text-4xl text-primary mb-2"></i>
+                                    <p class="text-gray-500 dark:text-gray-400">Chart visualization</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Event Performance -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-white dark:bg-gray-800 rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-primary">68%</div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400">Attendance Rate</div>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-secondary">4.8</div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400">Avg Rating</div>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-accent">$2,450</div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400">Revenue</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div>
+                    <div class="bg-gray-50 dark:bg-gray-900 rounded-xl p-6">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
+                        
+                        <div class="space-y-3">
+                            <button class="w-full bg-primary hover:bg-indigo-700 text-white p-3 rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center">
+                                <i class="fas fa-plus mr-2"></i>
+                                Create New Event
+                            </button>
+                            
+                            <button class="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white p-3 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center justify-center">
+                                <i class="fas fa-bullhorn mr-2"></i>
+                                Send Announcement
+                            </button>
+                            
+                            <button class="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white p-3 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center justify-center">
+                                <i class="fas fa-camera mr-2"></i>
+                                Upload Photos
+                            </button>
+                        </div>
+
+                        <!-- Recent RSVPs -->
+                        <div class="mt-6">
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">Recent RSVPs</h4>
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-2">
+                                        <!-- A professional headshot of a young woman smiling -->
+                                        <img src="https://pixabay.com/get/g7b13677c8d78194c8c37f4a5f4d03461331e603ff98162b3d07bacba30324845125d14988bab2022978887c8e2f816f793c2aee19574a4a48dab19c39fab19c0_1280.jpg" alt="Sarah" class="h-6 w-6 rounded-full">
+                                        <span class="text-sm text-gray-900 dark:text-white">Sarah K.</span>
+                                    </div>
+                                    <span class="text-xs text-green-600 dark:text-green-400">RSVP'd</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-2">
+                                        <!-- A professional headshot of a young man in business attire -->
+                                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100" alt="Mike" class="h-6 w-6 rounded-full">
+                                        <span class="text-sm text-gray-900 dark:text-white">Mike R.</span>
+                                    </div>
+                                    <span class="text-xs text-green-600 dark:text-green-400">RSVP'd</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-2">
+                                        <!-- A professional headshot of a woman with glasses -->
+                                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100" alt="Emma" class="h-6 w-6 rounded-full">
+                                        <span class="text-sm text-gray-900 dark:text-white">Emma L.</span>
+                                    </div>
+                                    <span class="text-xs text-red-600 dark:text-red-400">Cancelled</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Past Events & Reviews -->
+    <section class="py-12 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white text-center mb-8">Past Events</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Past Event with Photos -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+                    <!-- A successful tech meetup with people networking and laptops open -->
+                    <div class="h-48 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1556761175-4b46a572b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400');">
+                        <div class="h-full bg-black bg-opacity-40 flex items-end">
+                            <div class="p-6 text-white">
+                                <h3 class="text-xl font-bold mb-2">JavaScript Workshop</h3>
+                                <p class="text-sm opacity-90">Completed • Nov 20, 2024</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-1">
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">4.9 (32 reviews)</span>
+                            </div>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">45 attended</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-2 mb-4">
+                            <!-- A close-up of people coding together on laptops during a workshop -->
+                            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200" alt="Event photo" class="h-20 w-full object-cover rounded">
+                            <!-- A group photo of workshop participants smiling and giving thumbs up -->
+                            <img src="https://images.unsplash.com/photo-1515187029135-18ee286d815b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200" alt="Event photo" class="h-20 w-full object-cover rounded">
+                            <!-- An instructor teaching at a whiteboard with code examples -->
+                            <img src="https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200" alt="Event photo" class="h-20 w-full object-cover rounded">
+                        </div>
+                        
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                            <p class="text-sm text-gray-600 dark:text-gray-300 italic">
+                                "Great workshop! The instructor was knowledgeable and the hands-on approach really helped me understand the concepts."
+                            </p>
+                            <div class="flex items-center mt-2">
+                                <!-- A professional headshot of a satisfied workshop attendee -->
+                                <img src="https://images.unsplash.com/photo-1507591064344-4c6ce005b128?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100" alt="Reviewer" class="h-6 w-6 rounded-full mr-2">
+                                <span class="text-xs text-gray-500 dark:text-gray-400">Alex M.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Another Past Event -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+                    <!-- A successful outdoor community gathering with food and music -->
+                    <div class="h-48 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400');">
+                        <div class="h-full bg-black bg-opacity-40 flex items-end">
+                            <div class="p-6 text-white">
+                                <h3 class="text-xl font-bold mb-2">Community Food Festival</h3>
+                                <p class="text-sm opacity-90">Completed • Nov 12, 2024</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-1">
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <i class="far fa-star text-gray-300 dark:text-gray-600"></i>
+                                <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">4.2 (87 reviews)</span>
+                            </div>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">156 attended</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-2 mb-4">
+                            <!-- A diverse array of food trucks and vendors at a festival -->
+                            <img src="https://pixabay.com/get/g953ee02fed0b57999302d16492a379a71d98cf5e4829eb8634d54b7847c3fecbb7361835b5cacf24eab3af2f8e017613c3dd5534648f7db0f97d51c6037cc296_1280.jpg" alt="Event photo" class="h-20 w-full object-cover rounded">
+                            <!-- Families and children enjoying food and activities at outdoor festival -->
+                            <img src="https://images.unsplash.com/photo-1530023367847-a683933f4172?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200" alt="Event photo" class="h-20 w-full object-cover rounded">
+                            <!-- Live music performance on stage with crowd watching -->
+                            <img src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200" alt="Event photo" class="h-20 w-full object-cover rounded">
+                        </div>
+                        
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                            <p class="text-sm text-gray-600 dark:text-gray-300 italic">
+                                "Amazing food and great atmosphere! Perfect family event. Looking forward to next year."
+                            </p>
+                            <div class="flex items-center mt-2">
+                                <!-- A professional headshot of a happy family event attendee -->
+                                <img src="https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100" alt="Reviewer" class="h-6 w-6 rounded-full mr-2">
+                                <span class="text-xs text-gray-500 dark:text-gray-400">Jennifer L.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-calendar-alt text-2xl text-primary mr-2"></i>
+                        <span class="text-xl font-bold">EventHub</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">
+                        Your go-to platform for discovering and creating amazing local events and community gatherings.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">For Attendees</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors duration-200">Browse Events</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors duration-200">My Tickets</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors duration-200">Calendar Sync</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors duration-200">Notifications</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">For Organizers</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors duration-200">Create Event</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors duration-200">Host Dashboard</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors duration-200">Analytics</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors duration-200">Pricing</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Support</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors duration-200">Help Center</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors duration-200">Contact Us</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors duration-200">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors duration-200">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 EventHub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Action Button for Create Event -->
+    <button class="fixed bottom-6 right-6 bg-primary hover:bg-indigo-700 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-200 z-40">
+        <i class="fas fa-plus text-xl"></i>
+    </button>
+
+    <!-- Event Creation Modal (Hidden by default) -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4" id="createEventModal">
+        <div class="bg-white dark:bg-gray-800 rounded-xl max-w-2xl w-full max-h-screen overflow-y-auto">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Create New Event</h2>
+                    <button class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <form class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Event Title</label>
+                        <input type="text" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="Enter event title">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                <option>Select category</option>
+                                <option>Music</option>
+                                <option>Tech</option>
+                                <option>Art</option>
+                                <option>Sports</option>
+                                <option>Food</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Event Type</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                <option>Free</option>
+                                <option>Paid</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
+                        <textarea rows="4" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="Describe your event..."></textarea>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date</label>
+                            <input type="date" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Time</label>
+                            <input type="time" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Location</label>
+                        <input type="text" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="Event location">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Capacity</label>
+                            <input type="number" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="Max attendees">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Price ($)</label>
+                            <input type="number" step="0.01" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="0.00">
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col md:flex-row gap-4 pt-6">
+                        <button type="button" class="flex-1 bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200">
+                            Cancel
+                        </button>
+                        <button type="submit" class="flex-1 bg-primary hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200">
+                            Create Event
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Basic JavaScript for interactivity
+        (function() {
+            // TODO: Implement Google OAuth integration
+            // TODO: Implement event CRUD operations
+            // TODO: Implement RSVP functionality
+            // TODO: Implement Google Calendar sync
+            // TODO: Implement notification system
+            // TODO: Implement photo upload functionality
+            // TODO: Implement rating system
+            // TODO: Implement real-time updates
+
+            // Dark mode toggle
+            const darkModeToggle = document.querySelector('button[class*="fa-moon"], button[class*="fa-sun"]');
+            const html = document.documentElement;
+            
+            if (darkModeToggle) {
+                darkModeToggle.addEventListener('click', function() {
+                    html.classList.toggle('dark');
+                    // Save preference to localStorage
+                    localStorage.setItem('darkMode', html.classList.contains('dark'));
+                });
+            }
+
+            // Load dark mode preference
+            if (localStorage.getItem('darkMode') === 'true') {
+                html.classList.add('dark');
+            }
+
+            // Modal functionality
+            const createEventButton = document.querySelector('.fixed.bottom-6');
+            const modal = document.getElementById('createEventModal');
+            const closeModalButton = modal?.querySelector('.fa-times');
+
+            if (createEventButton && modal) {
+                createEventButton.addEventListener('click', function() {
+                    modal.classList.remove('hidden');
+                });
+            }
+
+            if (closeModalButton && modal) {
+                closeModalButton.addEventListener('click', function() {
+                    modal.classList.add('hidden');
+                });
+            }
+
+            // Close modal on outside click
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        modal.classList.add('hidden');
+                    }
+                });
+            }
+
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // Add hover effects to event cards
+            document.querySelectorAll('.group').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+        })();
+    </script>
+</body>
+</html>

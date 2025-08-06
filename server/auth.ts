@@ -2,7 +2,9 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import session from 'express-session';
 import type { Express } from 'express';
-import { storage } from './storage';
+import { storage } from './storage';import dotenv from 'dotenv';
+dotenv.config();
+
 
 export function setupAuth(app: Express) {
   // Session middleware
