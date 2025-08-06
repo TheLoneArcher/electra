@@ -23,9 +23,9 @@ export function setupAuth(app: Express) {
   app.use(passport.session());
 
   // Google OAuth Strategy - Fix redirect URI
-  const domain = process.env.REPLIT_DOMAINS || 'localhost:5000';
-  const callbackURL = domain.includes('localhost') ? `http://${domain}/api/auth/google/callback` : `https://${domain}/api/auth/google/callback`;
-  
+  const callbackURL = process.env.PUBLIC_DOMAIN
+  ? `${process.env.PUBLIC_DOMAIN}/api/auth/google/callback`
+  : `http://localhost:5000/api/auth/google/callback`;
   console.log('Google OAuth callback URL:', callbackURL);
     
   // Only set up Google strategy if credentials are available
